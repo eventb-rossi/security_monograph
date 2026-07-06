@@ -1,0 +1,22 @@
+Моделирование и верификация политик безопасности управления доступом
+в операционных системах
+
+П. Н. Девянин, Д. В. Ефремов, В. В. Кулямин, А. К. Петренко,
+А. В. Хорошилов, И. В. Щепетков
+
+© П. Н. Девянин, Д. В. Ефремов, В. В. Кулямин, А. К. Петренко,
+  А. В. Хорошилов, И. В. Щепетков, 2019
+© Институт системного программирования им. В.П. Иванникова
+  Российской академии наук (ИСП РАН), 2019
+
+ВСЕ ПРАВА ЗАЩИЩЕНЫ / ALL RIGHTS RESERVED
+
+--------------------------------------------------------------------------
+
+Приложение А. Примеры на языке Event-B являются переводом материалов
+Rodin Handbook (http://handbook.event-b.org), распространяемых по лицензии
+Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0).
+
+Appendix A: the Event-B examples are a translation of material from the
+Rodin Handbook (http://handbook.event-b.org), distributed under the
+Creative Commons Attribution-ShareAlike 3.0 Unported license (CC BY-SA 3.0).
