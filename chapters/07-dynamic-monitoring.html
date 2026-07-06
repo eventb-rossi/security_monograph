@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Глава 7. Динамический мониторинг – Моделирование и верификация политик безопасности управления доступом в операционных системах</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/conclusion.html" rel="next">
+<link href="../chapters/06-deductive-verification.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-375f9023c1da6849cf4f3d7f8accab6b.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-3d3bc5d9f0e246eedfcea4a82b2f9c37.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-375f9023c1da6849cf4f3d7f8accab6b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ca1fdf2217a789155a14a984c486a011.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Поиск не дал результатов",
+    "search-matching-documents-text": "Результаты поиска",
+    "search-copy-link-title": "Скопировать ссылку",
+    "search-hide-matches-text": "Скрыть дополнительные результаты",
+    "search-more-match-text": "дополнительный результат в этом документе",
+    "search-more-matches-text": "дополнительных результата(-ов) в этом документе",
+    "search-clear-button-title": "Очистить",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Отменить",
+    "search-submit-button-title": "Найти",
+    "search-label": "Поиск"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Переключить боковую панель навигации" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/07-dynamic-monitoring.html"><span class="chapter-title">Глава 7. Динамический мониторинг</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Переключить боковую панель навигации" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Поиск" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Моделирование и верификация политик безопасности управления доступом в операционных системах</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Переключить темный режим"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Поиск"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Моделирование и верификация политик безопасности управления доступом в операционных системах</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/00-preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Предисловие</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-formal-methods.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 1. Формальные методы в разработке и сертификации средств защиты информации</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-process.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 2. Описание процесса моделирования и верификации механизма управления доступом операционной системы</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-model.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 3. Модель политики безопасности управления доступом — требования к составу и структуре модели. Базовый уровень МРОСЛ ДП-модели</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-event-b.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-functional-spec.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 5. Формальная функциональная спецификация</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06-deductive-verification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 6. Дедуктивная верификация модуля безопасности ядра ОС Linux</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/07-dynamic-monitoring.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Глава 7. Динамический мониторинг</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/conclusion.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Заключение</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/abbreviations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Используемые сокращения и обозначения</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/bibliography.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Литература</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/appendix-a.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Приложение А. Язык спецификаций Event-B</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/appendix-b.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Приложение В. Среда разработки и верификации на языке Event-B</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/colophon.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Научное издание</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#управление-доступом-в-ядре-ос-linux" id="toc-управление-доступом-в-ядре-ос-linux" class="nav-link active" data-scroll-target="#управление-доступом-в-ядре-ос-linux">7.1. Управление доступом в ядре ОС Linux</a></li>
+  <li><a href="#схема-работы-анализа" id="toc-схема-работы-анализа" class="nav-link" data-scroll-target="#схема-работы-анализа">7.2. Схема работы анализа</a></li>
+  <li><a href="#сбор-трасс-ядра" id="toc-сбор-трасс-ядра" class="nav-link" data-scroll-target="#сбор-трасс-ядра">7.3. Сбор трасс ядра</a></li>
+  <li><a href="#механизм-воспроизведения-трасс-на-event-b-спецификации" id="toc-механизм-воспроизведения-трасс-на-event-b-спецификации" class="nav-link" data-scroll-target="#механизм-воспроизведения-трасс-на-event-b-спецификации">7.4. Механизм воспроизведения трасс на Event-B спецификации</a></li>
+  <li><a href="#интеграция-дедуктивной-верификации-и-динамического-мониторинга-при-верификации-модуля-безопасности" id="toc-интеграция-дедуктивной-верификации-и-динамического-мониторинга-при-верификации-модуля-безопасности" class="nav-link" data-scroll-target="#интеграция-дедуктивной-верификации-и-динамического-мониторинга-при-верификации-модуля-безопасности">7.5. Интеграция дедуктивной верификации и динамического мониторинга при верификации модуля безопасности</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">Глава 7. Динамический мониторинг</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>В этой главе рассматривается вопрос интегральной проверки соответствия поведения ядра Linux требованиям модели политики безопасности управления доступом (например, МРОСЛ ДП-модели). Соответствие проверяется посредством сверки результатов реальных операций по запросу доступа при помощи системных вызовов ядра ОС с правилами предоставления доступа (или отказа в доступе) модели политики безопасности. Для этого во время выполнения приложений (программ пользовательского пространства) в динамике трассируются системные вызовы, фиксируются их параметры и результаты. Далее на основе полученных данных воспроизводится обработка запросов доступа в ядре на формальной функциональной спецификации на языке Event-B (ФСП). На функциональной спецификации проверяется допустимость результатов обработки системного вызова.</p>
+<p>Данный подход наиболее целесообразно применять в рамках выполнения требований класса доверия «Тестирование» ГОСТ Р ИСО/МЭК 15408-3, который требует проведения тестирования ОО на соответствие функциональной спецификации (см. семейство доверия ATE_COV «Покрытие»). Автоматический сбор трассы выполнения и проведение проверки её соответствия формальной функциональной спецификации на языке Event-B позволяет избавиться от необходимости вручную вычислять ожидаемый результат каждой операции, что, в свою очередь, даёт возможность значительно повысить число и разнообразие проводимых тестов. Сбор информации о покрытии различных ситуаций в формальной функциональной спецификации также позволяет автоматизировать оценку покрытия интерфейсов функций безопасности, что является еще одним требованием семейства доверия ATE_COV «Покрытие».</p>
+<section id="управление-доступом-в-ядре-ос-linux" class="level2">
+<h2 class="anchored" data-anchor-id="управление-доступом-в-ядре-ос-linux">7.1. Управление доступом в ядре ОС Linux</h2>
+<p>Предварительно рассмотрим несколько подробнее схему работы ядра ОС в случае, когда необходимо провести анализ возможности предоставления того или иного вида доступа к некоторому ресурсу. Это позволит нам обосновать утверждение, что динамический мониторинг является необходимым этапом процесса верификации механизма управления доступом в ОССН.</p>
+<p>Программы пользовательского пространства осуществляют работу с внешними, по отношению к ним, ресурсами через ядро ОССН. Запросы на доступы выполняются посредством системных вызовов. Когда программа делает системный вызов, например, на открытие файла или сокета, ядро ОС выделяет соответствующий ресурс (например файловый дескриптор) и прикрепляет его к дескриптору процесса. Перед тем как ресурс будет выделен, делается большое число проверок на правильность аргументов в системном вызове, на существование запрашиваемых ресурсов, на возможность выделения этих ресурсов (например, хватает ли памяти), на возможность доступа к этим ресурсам (см. рис. 6.1). Если все предварительные проверки проходят и модуль LSM также разрешает доступ, то ресурс выделяется. В этой схеме важно еще раз отметить то, что управление до LSM-интерфейса может не дойти по очень большому числу причин. Соответственно, даже если системный вызов предполагает проверку LSM-модулем на какой-то стадии, то в общем случае осуществление системного вызова (запрос на доступ к ресурсам) не означает, что этот запрос попадает на обработку в LSM-модуль.</p>
+<p>ФСП не моделирует таких проверок из ядра, как возможность выделения ресурса: хватает ли памяти, не превышено ли ограничение на число открытых файлов и др. Соответственно, в реальности доступ к ресурсу может быть не предоставлен по причине нехватки ресурсов машины, хотя функциональная спецификация его разрешает. В ФСП ресурсы полагаются неограниченными. В ОС, где, например, ситуация нехватки ресурсов вполне может сложиться, отказ на выполнение той или иной операции доступа по этой причине может считаться нормой, т.е. не всегда считается ошибочным. В контексте проверки корректности реализации интерфейсов ОС по отношению к ФСП (а следовательно, и к модели политики управления доступом) как ошибка рассматривается ситуация, когда модель политики безопасности доступ запрещает, а в реальности он по какой-то причине был предоставлен.</p>
+<p>Подобная ошибка может произойти по разным причинам. Первая причина — ошибка обусловлена некорректной функциональностью модуля LSM. Это означает, что модуль неправильно реализует модель политики безопасности. Стадия дедуктивной верификации исходного кода модуля LSM, описанная в главе 6, нужна для того, чтобы исключить подобные ошибки. Вторая причина ошибки — ядро в какой-то момент не вызывает интерфейс LSM <a href="../chapters/bibliography.html#ref-88">[88–90]</a>, хотя это необходимо сделать. Либо LSM-интерфейс может быть не достаточно полным, в нем может не хватать некоторых функций для проверки определенных ситуаций <a href="../chapters/bibliography.html#ref-91">[91, 92]</a>.</p>
+<p>Помимо этого, стоит отметить, что дедуктивная верификация это статический анализ кода. Его точность зависит, в том числе, от самих инструментов анализа и от того, насколько модели, лежащие в основе анализа, полны и адекватны. Так, на текущий момент инструменты дедуктивной верификации (Frama-C и AstraVer) не моделируют стек (см. главу 6). В предусловиях к функциям нет требования на размер доступной памяти в стеке, необходимой для корректной работы функции. Также не моделируются еще некоторые ошибки, например не различается память, доступная только на чтение или на запись и чтение. Дедуктивная верификация анализирует тексты исходных кодов, в то время как на процессоре выполняется бинарный код, который был получен из исходного посредством компиляции. То есть мы не имеем гарантий того, что бинарный код семантически эквивалентен исходному <a href="../chapters/bibliography.html#ref-93">[93]</a>. Все перечисленные моменты являются ограничениями дедуктивной верификации и являются аргументами в пользу необходимости интегральной проверки соответствия поведения ядра ОС требованиям модели политики безопасности управления доступом в динамике, на основе анализа трасс выполнения системных вызовов.</p>
+<p>Для динамической проверки необходим тестовый набор, который воспроизводит разнообразные ситуации, связанные с запросами на доступ. Помимо этого, должен быть реализован «тестовый оракул» для проверки соответствия результатов работы системы ее функциональной спецификации как минимум в той части, которая определяется моделью политики безопасности управления доступом. В данной работе мы не рассматриваем вопрос построения такого тестового набора и вопрос критериев его полноты. Далее описывается сам метод динамической проверки, т. е. рассматриваются два вопроса: как получить данные о поведении ОО (трассу) и как выполнить динамический анализ трассы, т. е. как должен быть построен тестовый оракул.</p>
+</section>
+<section id="схема-работы-анализа" class="level2">
+<h2 class="anchored" data-anchor-id="схема-работы-анализа">7.2. Схема работы анализа</h2>
+<p>Схема работы мониторинга разбивается на две последовательных стадии — сбора информации о поведении ОО и ее анализ.</p>
+<p>На первой стадии осуществляется сбор трассы выполнения ядра Linux с модулем защиты в отдельную базу событий в человекочитаемом формате. В ОС в этот момент либо запускается специальный тестовый набор, либо система работает в стандартном режиме (работают некоторые пользовательские приложения). Важно уточнить, что ядро ОС в этот момент работает в одноядерном режиме, без поддержки мультипроцессорности и без режима вытеснения.</p>
+<p>Если мониторинг запускается без тестового набора, то в момент старта анализа в трассу записывается информация о глобальном состоянии ядра (модель состояния). Сюда попадает, например, информация о числе работающих процессов в системе, открытых ими файлах и соединениях. Для режима анализа с тестовым набором этого делать не требуется, так как влияние остальных процессов системы на тесты полагается минимальным и вся необходимая информация о начальном состоянии содержится в тестовом наборе.</p>
+<p>Далее в трассу собирается информация об обработке системных вызовов ядром. Для работы с тестовым набором собирается информация только о системных вызовах от тестов, в ином случае рассматриваются все процессы. В трассу попадает информация об аргументах системного вызова, о результатах его обработки ядром с кодом возврата. Дополнительно в трассу может записываться информация, которая помогает отобразить аргументы системных вызовов в вид, пригодный для использования при сравнении с ФСП.</p>
+<p>В момент завершения анализа в трассу записывается информация о глобальном состоянии ядра аналогично тому, как это делается при старте анализа.</p>
+<p>На второй стадии осуществляется анализ собранной трассы с целью выявления в ней ошибок предоставления доступа. Для этого обработка системных вызовов из собранной трассы перепроверяется на ФСП, т.е. обработка системных вызовов воспроизводится на ФСП. Результаты обработки системных вызовов в ядре и в спецификации сверяются. Здесь необходимо помнить, что в ФСП (см. главу 5) задаются события старта и конца обработки для каждого системного вызова, вводятся промежуточные события между событиями Event-B спецификации МРОСЛ ДП-модели и порядок их выполнения. Событие начала обработки системного вызова принимает на вход аргументы системного вызова. ФСП разрабатывается так, что при заданных аргументах системного вызова и состоянии системы из каждого события существует не более одного возможного следующего события обработки системного вызова, не являющегося событием возврата кода ошибки. Это означает, что существует не более одного пути в графовом представлении цепочки событий обработки системного вызова из начального события системного вызова в его конечное событие. В момент начала анализа трассы состояние формальной функциональной спецификации инициализируется в соответствии с записанной информацией о состоянии ядра ОС на момент старта мониторинга. В случае, если такая информация не собиралась, используется стандартная инициализация состояния спецификации.</p>
+<p>Далее последовательно анализируются системные вызовы из собранной трассы. Воспроизведение обработки системного вызова на ФСП выглядит следующим образом:</p>
+<ol type="1">
+<li>в событие начала обработки данного системного вызова поступают аргументы с реальной системы (берутся из трассы). В соответствии со спецификацией вычисляется следующее событие, обновляется состояние ФСП;</li>
+<li>если обработка следующего события оказалась невозможной, так как его охранные условия не выполнены, то считается, что с точки зрения ФСП доступ к ресурсу в результате обработки системного вызова не мог быть предоставлен;</li>
+<li>если охранные условия для следующего события выполнены и оно не является уточняющим для вышележащего слоя спецификации, то его обработка происходит так же, как в пункте 1;</li>
+<li>если охранные условия для следующего события выполнены и оно является уточняющим для вышележащего слоя спецификации, то происходит проверка охранных условий всех вышележащих уровней уточнений. В случае успешного прохождения последней состояние спецификации обновляется в соответствии с правилами перехода системы из состояния в состояние. Если же условия не выполнены, то считается, что доступ к запрашиваемому ресурсу не мог быть предоставлен в соответствии с моделью политики безопасности;</li>
+<li>в случае, если обработка системного вызова на ФСП дошла до события завершения системного вызова и охранные условия для него были выполнены, то считается, что с точки зрения ФСП и модели политики безопасности доступ к ресурсу может быть предоставлен (системный вызов может быть успешно обработан).</li>
+</ol>
+<p>Следующим шагом сверяются результаты (возвращаемые коды) обработки системного вызова из трассы и из ФСП :</p>
+<ol type="1">
+<li><p>когда оба результата положительны (нет ошибки, доступ запрещен), осуществляется переход к анализу следующего системного вызова из трассы;</p></li>
+<li><p>когда результат в трассе отрицательный (доступ запрещен), а на ФСП положительный (доступ разрешен), то рассматривается код ошибки системного вызова. В коде ошибки содержится информация о причине неудачи обработки системного вызова. После рассмотрения «расхождения» на ФСП происходит возврат к модельному состоянию «до начала обработки» данного системного вызова (на момент вызова события его обработки), и начинается обработка следующего системного вызова из трассы. Если причина неудачи обработки системного вызова в ядре Linux заключается в:</p>
+<ul>
+<li>нехватке ресурсов физической машины, то не производится никаких дополнительных действий;</li>
+<li>в «некорректных» аргументах системного вызова, то с большой вероятностью это сигнализирует о том, что ФСП недостаточно полна. Данное расхождение записывается в журнал «аномалий»;</li>
+<li>нехватке разрешений (для доступа), то с большой вероятностью это сигнализирует о наличии ошибки в ядре и модуле безопасности ядра (слишком сильное ограничение). Данное расхождение записывается в журнал «аномалий»;</li>
+</ul></li>
+<li><p>когда результат в трассе положительный, а на ФСП отрицательный, данная ситуация свидетельствует об ошибке в ядре и модуле безопасности ядра. При этом расхождении дальнейший анализ трассы теряет смысл. Анализ останавливается и сигнализирует о найденной ошибке предоставления доступа;</p></li>
+<li><p>когда оба результата отрицательны (ошибка, доступ разрешен), осуществляется переход к анализу следующего системного вызова из трассы;</p></li>
+<li><p>если анализ трассы дошел до ее конца, то производится сверка состояний спецификации и ядра. Расхождения записываются в журнал «аномалий».</p></li>
+</ol>
+<p>Результатом работы анализа является журнал «аномалий», в котором содержатся пункты расхождения поведения реальной системы с ФСП. Данные журнала анализируются ручным образом. По результатам выявляются ошибки либо в исходном коде ядра и модуля безопасности, либо в ФСП.</p>
+<p>В этом разделе была рассмотрена общая схема работы анализатора, состоящая из двух последовательных этапов: сбор трасс и их анализ на ФСП. Далее будут рассмотрены механизмы осуществления данных этапов.</p>
+</section>
+<section id="сбор-трасс-ядра" class="level2">
+<h2 class="anchored" data-anchor-id="сбор-трасс-ядра">7.3. Сбор трасс ядра</h2>
+<p>Для мониторинга ядра Linux существует большое число инструментов <a href="../chapters/bibliography.html#ref-94">[94–100]</a>. Одним из наиболее удобных является SystemTap. Он позволяет относительно легко логировать, как обработку системных вызовов, так и иные события на работающем ядре Linux.</p>
+<p>SystemTap поддерживает специальный язык (похожий на скриптовый) для описания точек мониторинга и сбора информации о работающей системе. При этом инструментом предоставляется возможность обращения к практически любой информации в точке мониторинга: глобальные и локальные переменные, стек вызовов и др.</p>
+<p>Описание скрипта мониторинга преобразуется инструментом в код загружаемого модуля ядра Linux на языке Си. Для мониторинга данный код компилируется и динамическим образом загружается в ядро, что не требует перезагрузки системы. Инструмент предоставляет наиболее богатые возможности описания точек мониторинга, если ядро Linux собрано с отладочной информацией, что ведет к дополнительным накладным расходам и частично объясняет разбиение анализа на два последовательных этапа.</p>
+<p>SystemTap имеет много уже готовых описаний точек мониторинга (probe points). Например, для мониторинга большинства системных вызовов, их аргументов и результатов их обработки на одноядерной машине возможно использовать простой скрипт:</p>
+<p>Листинг 7.1. Скрипт мониторинга системных вызовов SystemTap</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode c code-with-copy"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>probe syscall<span class="op">.*</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">"</span><span class="sc">%s</span><span class="st">: </span><span class="sc">%s</span><span class="st">(</span><span class="sc">%s</span><span class="st">)"</span><span class="op">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    execname<span class="op">(),</span> name<span class="op">,</span> argstr<span class="op">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>probe syscall<span class="op">.*.</span><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">"res: </span><span class="sc">%s\n</span><span class="st">"</span><span class="op">,</span> retstr<span class="op">)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Пример выводимого лога приведен в табл. 7.1.</p>
+<p>Для воспроизведения поведения ядра на ФСП в трассу необходимо собирать информацию об аргументах системных вызовов, результатах их обработки, дополнительную информацию, которая позволила бы отображать состояние структур данных ядра на состояние структур данных спецификации, глобальное состояние структур данных ядра на момент начала и конца мониторинга.</p>
+<p>В ядре Linux из модулей могут напрямую вызываться функции системных вызовов (то есть, условно говоря, системный вызов приходит не от приложения, а от самого ядра) и таким образом происходит вмешательство в пользовательское окружение со стороны ядра, которое в данном случае может рассматриваться как действие привилегированного процесса. Сама по себе такая ситуация происходит достаточно редко и по вполне определенным причинам (например, coredump, OOM Killer). В том случае, когда мы контролируем тестовый набор, подобного рода события могут не обрабатываться специальным образом, так как они заранее известны.</p>
+<p>Таблица 7.1. Пример выводимого лога скрипта мониторинга системных вызовов</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 17%">
+<col style="width: 57%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Процесс</th>
+<th>Системный вызов</th>
+<th>Аргументы</th>
+<th>Код возврата</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>konsole</td>
+<td>write</td>
+<td>95,<br>«\0»,<br>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td>ksmserver</td>
+<td>ioctl</td>
+<td>28,<br>21531,<br>0x7fffab1c9ec4</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td>ksmserver</td>
+<td>read</td>
+<td>28,<br>0x5626d6785938,<br>40</td>
+<td>40</td>
+</tr>
+<tr class="even">
+<td>konsole</td>
+<td>lseek</td>
+<td>94,<br>-2147482516,<br>SEEK_SET</td>
+<td>-22 (EINVAL)</td>
+</tr>
+<tr class="odd">
+<td>konsole</td>
+<td>write</td>
+<td>2, «HistoryFile::add.seek:<br>Invalid argument»,<br>40</td>
+<td>40</td>
+</tr>
+<tr class="even">
+<td>konsole</td>
+<td>lseek</td>
+<td>93,<br>22447548,<br>SEEK_SET</td>
+<td>22447548</td>
+</tr>
+<tr class="odd">
+<td>konsole</td>
+<td>write</td>
+<td>93,<br>«l\004\0\200»,<br>4</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="механизм-воспроизведения-трасс-на-event-b-спецификации" class="level2">
+<h2 class="anchored" data-anchor-id="механизм-воспроизведения-трасс-на-event-b-спецификации">7.4. Механизм воспроизведения трасс на Event-B спецификации</h2>
+<p>Инструменты для работы с Event-B спецификациями <a href="../chapters/bibliography.html#ref-44">[44]</a> не предоставляют возможности проверки допустимости определенной последовательности событий. Для этого требуется интерпретатор спецификации. Добиться аналогичного результата возможно, если осуществить трансляцию Event-B спецификации в нотацию одного из интерпретируемых или исполняемых языков.</p>
+<p>Существующие трансляторы Event-B в исполняемый код <a href="../chapters/bibliography.html#ref-101">[101– 103]</a> достаточно узкоспециализированы и в полной мере возможностей, необходимых для воспроизведения трасс, не предоставляют.</p>
+<p>Для анализа трассы системных вызовов на воспроизводимость на ФСП используется разработанный авторами транслятор Event-B спецификации в язык Python. Правила трансляции операций аналогичны тем, которые используются в вышеприведенных работах. При трансляции задаются две модели управления: когда на вход подается трасса, где уже полностью записаны переходы между событиями спецификации, и вторая модель — когда осуществляется подбор следующего события из текущего (для ФСП).</p>
+<p>Статическая часть спецификации Event-B транслируется в систему типов (отображения, множества, перечисления), константы, а динамическая часть в функции. Переменные состояния спецификации в соответствии с их инвариантами транслируются в глобальные переменные Python:</p>
+<p>Листинг 7.2. Переменные состояния спецификации на Event-B</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  CurrUnion</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  SubjectUser</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CurrUnionType</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    CurrUnion <span class="op">⊆</span> Union</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectUserType</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    SubjectUser <span class="op">∈</span> Subjects <span class="op">→</span> UserAccs</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Листинг 7.3. Трансляция переменных состояния в Python</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>CurrUnion <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>SubjectUser <span class="op">=</span> <span class="bu">dict</span>()</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Инварианты спецификации транслируются в функции проверки глобальных переменных, которые вызываются после каждого события спецификации:</p>
+<p>Листинг 7.4. Инварианты Event-B спецификации</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CurrUnionPartition</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">partition</span>(CurrUnion, UserAccs, Subjects, Entities, Roles)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAccsAreNotEmpty</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    UserAccs <span class="op">≠</span> <span class="cn">∅</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectsAreNotEmpty</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    Subjects <span class="op">≠</span> <span class="cn">∅</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectAccessesType</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    SubjectAccesses <span class="op">∈</span> Subjects <span class="op">→</span> (Entities <span class="op">↔</span> Accesses)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Листинг 7.5. Трансляция инвариантов в Python</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="at">@invariant</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> CurrUnionPartiton() <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> (CurrUnion <span class="op">==</span> UserAccs <span class="op">|</span> Subjects <span class="op">|</span> Entities) <span class="kw">and</span> <span class="op">\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>         <span class="kw">not</span> (UserAccs <span class="op">&amp;</span> Subjects) <span class="kw">and</span> <span class="op">\</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>         <span class="kw">not</span> (UserAccs <span class="op">&amp;</span> Entities) <span class="kw">and</span> <span class="op">\</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>         <span class="kw">not</span> (Subjects <span class="op">&amp;</span> Entities)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">@invariant</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> UserAccsAreNotEmpty() <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">bool</span>(UserAccs)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">@invariant</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> SubjectsAreNotEmpty() <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">bool</span>(Subjects)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">@invariant</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> SubjectAccessesType() <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">all</span>(<span class="bu">map</span>(<span class="kw">lambda</span> s: s <span class="kw">in</span> Subjects <span class="kw">and</span> <span class="bu">all</span>(<span class="bu">map</span>(<span class="kw">lambda</span> j: j[<span class="dv">0</span>] <span class="kw">in</span> Entities <span class="kw">and</span> <span class="bu">type</span>(j[<span class="dv">1</span>]) <span class="kw">is</span> Accesses, SubjectAccesses[s])), SubjectAccesses))</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>События транслируются в соответствующие функции. Охранные условия события транслируются в проверки внутри функции, а действия в событии преобразуются в операции обновления глобальных переменных. Уровни уточнений реализуются через механизм наследования в языке Python.</p>
+<p>Листинг 7.6. Пример транслируемых Event-B событий</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">event</span> delete_user</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">any</span> user</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd1</span> user <span class="op">∈</span> UserAccs</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd2</span> <span class="op">∀</span> s <span class="op">·</span> s <span class="op">∈</span> Subjects <span class="op">⇒</span> SubjectUser(s) <span class="op">≠</span> user</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act1</span> CurrUnion <span class="op">:=</span> CurrUnion <span class="op">\</span> {user}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act2</span> UserAccs <span class="op">:=</span> UserAccs <span class="op">\</span> {user}</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="kw">event</span> create_object</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">any</span> subject object parent name dLabel mountPoint depth</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd1</span> object <span class="op">∈</span> Union <span class="op">\</span> CurrUnion</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd2</span> subject <span class="op">∈</span> Subjects</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd3</span> parent <span class="op">∈</span> Containers</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd4</span> parent <span class="op">↦</span> WriteA <span class="op">∈</span> SubjectAccesses(subject)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd5</span> name <span class="op">∈</span> Names</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd6</span> <span class="op">∀</span> e <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">⇒</span> parent <span class="op">↦</span> name <span class="op">∉</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>      EntityNames(e)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd7</span> mountPoint <span class="op">∈</span> Containers</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd8</span> dLabel <span class="op">∈</span> <span class="fu">BOOL</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd9</span> <span class="op">∀</span> e <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> parent <span class="op">∈</span> <span class="op">dom</span>(EntityNames(e))</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> Direct(e) <span class="op">=</span> dLabel</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd10</span> dLabel <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">⇒</span> Direct(parent) <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd11</span> dLabel <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">⇒</span> mountPoint <span class="op">=</span> Root</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd12</span> dLabel <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> Direct(parent) <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> mountPoint <span class="op">=</span> EntityMP(parent)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd13</span> dLabel <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> Direct(parent) <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">⇒</span> mountPoint <span class="op">=</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>      parent</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act1</span> CurrUnion <span class="op">:=</span> CurrUnion <span class="op">∪</span> {object}</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act2</span> Entities <span class="op">:=</span> Entities <span class="op">∪</span> {object}</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act3</span> Objects <span class="op">:=</span> Objects <span class="op">∪</span> {object}</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act4</span> EntityNames(object) <span class="op">:=</span> {parent <span class="op">↦</span> name}</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act5</span> Direct(object) <span class="op">:=</span> dLabel</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act6</span> EntityMP(object) <span class="op">:=</span> mountPoint</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Листинг 7.7. Пример результата трансляции Event-B событий в Python</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="at">@event</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> delete_user(user):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> CurrUnion</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> UserAccs</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> user <span class="kw">in</span> UserAccs, <span class="st">"grd1"</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="bu">all</span>(<span class="bu">map</span>(<span class="kw">lambda</span> s: SubjectUser[s] <span class="op">!=</span> user, Subjects)), <span class="st">"grd2"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  CurrUnion.discard(user)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  UserAccs.discard(user)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">@event</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_object(subject, <span class="bu">object</span>: Union, parent, name: Names, dLabel: <span class="bu">bool</span>, mountPoint):</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> CurrUnion</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> Entities</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> Objects</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> EntityNames</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> Direct</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="kw">global</span> EntityMP</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="bu">object</span> <span class="kw">not</span> <span class="kw">in</span> CurrUnion, <span class="st">"grd1"</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> subject <span class="kw">in</span> Subjects, <span class="st">"grd2"</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> parent <span class="kw">in</span> Containers, <span class="st">"grd3"</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> (parent, WriteA) <span class="kw">in</span> SubjectAccesses[subject], <span class="st">"grd4"</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="bu">all</span>(<span class="bu">map</span>(<span class="kw">lambda</span> e: (parent, name) <span class="kw">not</span> <span class="kw">in</span> EntityNames[e], dom(EntityNames))), <span class="st">"grd6"</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> mountPoint <span class="kw">in</span> Containers, <span class="st">"grd7"</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="bu">all</span>(<span class="bu">map</span>(<span class="kw">lambda</span> e: <span class="kw">not</span> (parent <span class="kw">in</span> dom(EntityNames[e])) <span class="kw">or</span> Direct[e] <span class="op">==</span> dLabel, dom(EntityNames))), <span class="st">"grd9"</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="kw">not</span>(dLabel <span class="op">==</span> <span class="va">True</span>) <span class="kw">or</span> Direct[parent] <span class="op">==</span> <span class="va">True</span>, <span class="st">"grd10"</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="kw">not</span>(dLabel <span class="op">==</span> <span class="va">True</span>) <span class="kw">or</span> mountPoint <span class="op">==</span> Root, <span class="st">"grd11"</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="kw">not</span>(dLabel <span class="op">==</span> <span class="va">False</span> <span class="kw">and</span> Direct[parent] <span class="op">==</span> <span class="va">False</span>) <span class="kw">or</span> (mountPoint <span class="op">==</span> EntityMP[parent]), <span class="st">"grd12"</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">assert</span> <span class="kw">not</span>(dLabel <span class="op">==</span> <span class="va">False</span> <span class="kw">and</span> Direct[parent] <span class="op">==</span> <span class="va">True</span>) <span class="kw">or</span> (mountPoint <span class="op">==</span> parent), <span class="st">"grd13"</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  CurrUnion.add(<span class="bu">object</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  Entities.add(<span class="bu">object</span>)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  Objects.add(<span class="bu">object</span>)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  EntityNames[<span class="bu">object</span>] <span class="op">=</span> {(parent, name)}</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  Direct[<span class="bu">object</span>] <span class="op">=</span> dLabel</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  EntityMP[<span class="bu">object</span>] <span class="op">=</span> mountPoint</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="интеграция-дедуктивной-верификации-и-динамического-мониторинга-при-верификации-модуля-безопасности" class="level2">
+<h2 class="anchored" data-anchor-id="интеграция-дедуктивной-верификации-и-динамического-мониторинга-при-верификации-модуля-безопасности">7.5. Интеграция дедуктивной верификации и динамического мониторинга при верификации модуля безопасности</h2>
+<p>За рамками данной главы остается вопрос трансляции ACSL спецификаций в проверки времени выполнения кода (assertions).</p>
+<p>Дедуктивная верификация основывается на следующих предположениях.</p>
+<ol type="1">
+<li><p>Предположение о корректной работе компилятора. Процесс дедуктивной верификации доказывает соответствие исходного кода требованиям. В дальнейшем исходный код преобразуется транслятором/компилятором в бинарный. Дедуктивная верификация опирается на то предположение, что трансляция кода в бинарный осуществляется корректным образом. Отталкиваясь от этого предположения, можно сказать, что требования по безопасности соблюдаются и на бинарном коде, т. е. том коде, что непосредственно выполняется на процессоре.</p></li>
+<li><p>Предположение о корректной работе инструментов дедуктивной верификации. Ошибки в инструментах дедуктивной верификации не являются чем-то исключительным и могут приводить к разнообразным последствиям. Большинство из них удается выявить на этапе работы с инструментами, так как они имеют видимые проявления. Например, инструменты не запускаются на коде, порождаемые логические формулы не доказываются. К сожалению, нельзя исключать возможности ошибок в инструментах, которые приводили бы к тому, что порождаемые условия верификации доказываются, хотя на самом этого происходить не должно (по причине ошибки в коде/требованиях).</p></li>
+<li><p>Предположение о полноте спецификаций внешних интерфейсов модуля (интерфейсов ядра). Как правило, размер модуля безопасности ядра ограничивается несколькими тысячами строк кода. Размеры сердцевины ядра, как и остальных модулей ядра, используемых при работе, в сумме могут давать несколько миллионов строк кода <a href="../chapters/bibliography.html#ref-104">[104]</a>. Модуль безопасности ядра взаимодействует с сердцевиной посредством интерфейса LSM (сердцевина <span class="math inline">\rightarrow</span> модуль) и через экспортируемые функции ядра (модуль <span class="math inline">\rightarrow</span> сердцевина). Доказательство корректности экспортируемых ядром функций не представляется возможным, так как для этого, по меньшей мере, потребовалось бы доказательство корректности сердцевины ядра. Соответственно, для задействованных модулем функций ядра составляются спецификации без их доказательства, для функций интерфейса LSM составляются спецификации, описывающие контекст их вызова, которые также остаются без доказательства. В данных спецификациях могут быть ошибки, отсутствие полноты описания возможных особенностей контекста вызова. В случае подобной ошибки. например, в предусловиях к интерфейсу LSM в коде модуля также могут обнаружится ситуации, обработка которых не предусматривалась. В таком случае дедуктивная верификация покажет, отталкиваясь от неполных/ошибочных предположений, полную корректность кода.</p></li>
+</ol>
+<p>Учитывая отсутствие гарантий выполнения перечисленных выше предположений и принимая во внимание ограничения подхода, можно в дополнение к дедуктивной верификации осуществлять проверки в момент выполнения кода. Так, например, если оттранслировать предусловия к интерфейсу LSM в проверки времени выполнения (assertions), то это позволит в динамике проверить спецификации, при отсутствии возможности их доказать. Таким образом повышается общий уровень доверия к тем исходным предположениям, на основе которых осуществлялась дедуктивная верификация.</p>
+<p>Для реализации этой идеи можно воспользоваться расширением E-ACSL <a href="../chapters/bibliography.html#ref-105">[105]</a> для платформы Frama-C, где на основе исходных кодов и спецификаций к ним на языке ACSL порождает новый исходный код с проверками времени выполнения. Расширение E-ACSL работает лишь с подмножеством языка ACSL <a href="../chapters/bibliography.html#ref-106">[106]</a>. Так, например, невозможно отобразить леммы и аксиомы в исполняемый код по очевидным причинам. Для моделирования работы со спецификационными типами чисел (неограниченными) используется библиотека libgmp, а также собственная библиотека для отслеживания состояний памяти <a href="../chapters/bibliography.html#ref-107">[107]</a>.</p>
+<p>К сожалению, существующие инструменты для подобного рода трансформации спецификаций недостаточно зрелы для использования на коде ядра Linux и поддерживают в полной мере лишь некоторое подмножество E-ACSL. В инструментах реализована пока далеко не полная функциональность из заявленной в E-ACSL.</p>
+<p>Данный вид анализа важен и должен быть интегрирован в систему тестирования модуля безопасности по мере развития средств верификации. Одним из открытых вопросов его интеграции остается трансляция логических утверждений, описывающих состояние памяти. Для ядра Linux это требует гораздо больших усилий, чем при работе с приложением пользовательского уровня. Одним из решений могло бы быть использование уже существующих динамических средств проверок доступа к памяти kasan, kmsan. Однако их использование не позволяет в полной мере транслировать все допустимые языком E-ACSL логические утверждения на память в проверки времени выполнения и не позволяет обращаться к состояниям памяти по временным меткам.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<!-- Normalize Graphviz (dot) figures so the book's diagram CSS can size them.
+     Quarto stamps dot <svg> with a fixed width/height (default 7x5in) and an inline
+     style="max-width:none", which forces the wrong aspect ratio (vertical whitespace)
+     and defeats the responsive max-width in theme.scss. Removing the forced width/height
+     lets the intrinsic viewBox drive the aspect; clearing the inline max-* lets the
+     stylesheet cap the width. Mermaid manages its own sizing, so we touch dot only. -->
+<script>
+(function () {
+  function fit() {
+    document.querySelectorAll('main.content div.cell svg').forEach(function (svg) {
+      if (!svg.querySelector(':scope > g.graph')) return;   // graphviz output only
+      svg.removeAttribute('width');
+      svg.removeAttribute('height');
+      svg.style.maxWidth = '';
+      svg.style.maxHeight = '';
+    });
+  }
+  if (document.readyState !== 'loading') fit();
+  else document.addEventListener('DOMContentLoaded', fit);
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Скопировано");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Скопировано");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/eventb-rossi\.github\.io\/security_monograph\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/06-deductive-verification.html" class="pagination-link" aria-label="Глава 6. Дедуктивная верификация модуля безопасности ядра ОС Linux">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Глава 6. Дедуктивная верификация модуля безопасности ядра ОС Linux</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/conclusion.html" class="pagination-link" aria-label="Заключение">
+        <span class="nav-page-text"><span class="chapter-title">Заключение</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

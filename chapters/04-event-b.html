@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели – Моделирование и верификация политик безопасности управления доступом в операционных системах</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/05-functional-spec.html" rel="next">
+<link href="../chapters/03-model.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-375f9023c1da6849cf4f3d7f8accab6b.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-3d3bc5d9f0e246eedfcea4a82b2f9c37.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-375f9023c1da6849cf4f3d7f8accab6b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ca1fdf2217a789155a14a984c486a011.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Поиск не дал результатов",
+    "search-matching-documents-text": "Результаты поиска",
+    "search-copy-link-title": "Скопировать ссылку",
+    "search-hide-matches-text": "Скрыть дополнительные результаты",
+    "search-more-match-text": "дополнительный результат в этом документе",
+    "search-more-matches-text": "дополнительных результата(-ов) в этом документе",
+    "search-clear-button-title": "Очистить",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Отменить",
+    "search-submit-button-title": "Найти",
+    "search-label": "Поиск"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Переключить боковую панель навигации" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/04-event-b.html"><span class="chapter-title">Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Переключить боковую панель навигации" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Поиск" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Моделирование и верификация политик безопасности управления доступом в операционных системах</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Переключить темный режим"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Поиск"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Моделирование и верификация политик безопасности управления доступом в операционных системах</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/00-preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Предисловие</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-formal-methods.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 1. Формальные методы в разработке и сертификации средств защиты информации</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-process.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 2. Описание процесса моделирования и верификации механизма управления доступом операционной системы</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-model.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 3. Модель политики безопасности управления доступом — требования к составу и структуре модели. Базовый уровень МРОСЛ ДП-модели</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-event-b.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-functional-spec.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 5. Формальная функциональная спецификация</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06-deductive-verification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 6. Дедуктивная верификация модуля безопасности ядра ОС Linux</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/07-dynamic-monitoring.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 7. Динамический мониторинг</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/conclusion.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Заключение</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/abbreviations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Используемые сокращения и обозначения</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/bibliography.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Литература</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/appendix-a.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Приложение А. Язык спецификаций Event-B</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/appendix-b.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Приложение В. Среда разработки и верификации на языке Event-B</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/colophon.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Научное издание</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#формальные-спецификации" id="toc-формальные-спецификации" class="nav-link active" data-scroll-target="#формальные-спецификации">4.1. Формальные спецификации</a></li>
+  <li><a href="#связь-элементов-мросл-дп-модели-и-элементов-event-b-спецификации" id="toc-связь-элементов-мросл-дп-модели-и-элементов-event-b-спецификации" class="nav-link" data-scroll-target="#связь-элементов-мросл-дп-модели-и-элементов-event-b-спецификации">4.2. Связь элементов МРОСЛ ДП-модели и элементов Event-B спецификации</a></li>
+  <li><a href="#контекст" id="toc-контекст" class="nav-link" data-scroll-target="#контекст">4.3. Контекст</a></li>
+  <li><a href="#машина" id="toc-машина" class="nav-link" data-scroll-target="#машина">4.4. Машина</a>
+  <ul class="collapse">
+  <li><a href="#переменные-и-инварианты" id="toc-переменные-и-инварианты" class="nav-link" data-scroll-target="#переменные-и-инварианты">4.4.1. Переменные и инварианты</a></li>
+  <li><a href="#событие-инициализации" id="toc-событие-инициализации" class="nav-link" data-scroll-target="#событие-инициализации">4.4.2. Событие инициализации</a></li>
+  <li><a href="#реализация-правила-перехода-системы-из-состояния-в-состояние-в-виде-события" id="toc-реализация-правила-перехода-системы-из-состояния-в-состояние-в-виде-события" class="nav-link" data-scroll-target="#реализация-правила-перехода-системы-из-состояния-в-состояние-в-виде-события">4.4.3. Реализация правила перехода системы из состояния в состояние в виде события</a></li>
+  <li><a href="#использование-вспомогательных-параметров" id="toc-использование-вспомогательных-параметров" class="nav-link" data-scroll-target="#использование-вспомогательных-параметров">4.4.4. Использование вспомогательных параметров</a></li>
+  <li><a href="#использование-математической-индукции" id="toc-использование-математической-индукции" class="nav-link" data-scroll-target="#использование-математической-индукции">4.4.5. Использование математической индукции</a></li>
+  <li><a href="#разделение-правила-перехода-системы-из-состояния-в-состояние-на-несколько-событий" id="toc-разделение-правила-перехода-системы-из-состояния-в-состояние-на-несколько-событий" class="nav-link" data-scroll-target="#разделение-правила-перехода-системы-из-состояния-в-состояние-на-несколько-событий">4.4.6. Разделение правила перехода системы из состояния в состояние на несколько событий</a></li>
+  <li><a href="#отсутствующие-в-спецификации-элементы-мросл-дп-модели" id="toc-отсутствующие-в-спецификации-элементы-мросл-дп-модели" class="nav-link" data-scroll-target="#отсутствующие-в-спецификации-элементы-мросл-дп-модели">4.4.7. Отсутствующие в спецификации элементы МРОСЛ ДП-модели</a></li>
+  <li><a href="#формализация-свойств-безопасности-мросл-дп-модели" id="toc-формализация-свойств-безопасности-мросл-дп-модели" class="nav-link" data-scroll-target="#формализация-свойств-безопасности-мросл-дп-модели">4.4.8. Формализация свойств безопасности МРОСЛ ДП-модели</a></li>
+  </ul></li>
+  <li><a href="#верификация" id="toc-верификация" class="nav-link" data-scroll-target="#верификация">4.5. Верификация</a></li>
+  <li><a href="#использование-уточнения" id="toc-использование-уточнения" class="nav-link" data-scroll-target="#использование-уточнения">4.6. Использование уточнения</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Как отмечено в главе 1, компонент доверия ADV_SMP.1 «Формальная модель политики безопасности» требует наличия формальной модели политики безопасности, причем язык представления формальной модели может быть либо математическим, либо формализованным. Базовый уровень МРОСЛ ДП-модели был изложен на математическом языке в главе 3. В данной главе рассматривается перевод базового уровня модели на формализованный язык формального метода Event-B <a href="../chapters/bibliography.html#ref-21">[21]</a>, который позволит использовать автоматические и интерактивные инструменты для ее верификации. Глава рассчитана на читателя, который впервые сталкивается с текстом на языке Event-B, так что все основные используемые конструкции будут поясняться по ходу их появления. При желании ознакомиться с Event-B предлагается обратить внимание на Приложение Б либо ознакомиться с официальной документацией <a href="../chapters/bibliography.html#ref-37">[37]</a>.</p>
+<p>Имеется несколько формальных методов, при помощи которых можно было бы представить МРОСЛ ДП-модель в формализованном виде. Примерами таких методов являются ASM <a href="../chapters/bibliography.html#ref-38">[38]</a>, Alloy <a href="../chapters/bibliography.html#ref-39">[39]</a>, В <a href="../chapters/bibliography.html#ref-40">[40]</a>, Event-B, TLA+ <a href="../chapters/bibliography.html#ref-41">[41]</a>, VDM <a href="../chapters/bibliography.html#ref-42">[42]</a>, Z <a href="../chapters/bibliography.html#ref-43">[43]</a>. Нами был выбран формальный метод Event-B, так как он отличается простым и понятым языком, спецификации на котором разрабатываются и верифицируются с помощью хорошо апробированной платформы Rodin <a href="../chapters/bibliography.html#ref-44">[44]</a>. Кроме того, Event-B хорошо себя зарекомендовал как средство специфицирования так называемых систем, управляемых событиями (event-driven systems). Так как ОС может рассматриваться как подобная система, то выбор Event-B для специфицирования механизма управления доступом ОС представляется весьма разумным. При этом структура спецификаций на Event-B хорошо соответствует компонентам МРОСЛ ДП-модели, что упрощает задачу перевода модели на данный формализованный язык.</p>
+<section id="формальные-спецификации" class="level2">
+<h2 class="anchored" data-anchor-id="формальные-спецификации">4.1. Формальные спецификации</h2>
+<p>Под формальной спецификацией некоторой системы далее подразумевается автоматная модель (здесь термины «модель» и «спецификация» используются как синонимы), которая состоит из следующих частей:</p>
+<ul>
+<li>набора состояний, описываемых некоторыми внутренними данными или переменными системы (возможные комбинации значений переменных задают возможные состояния);</li>
+<li>выделенного непустого множества возможных начальных состояний (может быть, включающего только одно состояние);</li>
+<li>набора событий и правил, определяющих переходы между состояниями (изменения значений переменных) по произошедшим событиям;</li>
+<li>набора свойств или требований, которые должны выполняться во всех достижимых состояниях системы.</li>
+</ul>
+<p>Задача доказательства корректности спецификации или ее верификация заключается в подтверждении при помощи симуляции, статического анализа или формального математического доказательства того, что сформулированные в рамках спецификации свойства и требования действительно выполняются во всех достижимых состояниях, т.е. в тех состояниях, в которые система может перейти из некоторого начального состояния в результате произвольных последовательностей событий в соответствии с описанными в спецификации правилами. Благодаря своей формальной математической природе, спецификации могут быть верифицированы с помощью различных автоматических инструментов. В случае Event-B можно воспользоваться, например, инструментами, которые являются частью платформы Rodin.</p>
+<p>В Event-B каждая спецификация состоит из компонентов двух типов: контекстов и машин (рис. 4.1). Контексты содержат статическую, неизменяемую часть спецификации: определения множеств и констант, а также аксиомы, являющиеся предикатами, в виде которых описываются типы и свойства констант и множеств. Аксиомы принимаются истинными без доказательства.</p>
+<p>В отличие от контекстов машины содержат динамическую часть спецификации. Машины имеют доступ к элементам контекста через механизм «видения», что позволяет использовать определенные там константы и множества. В машинах содержатся переменные, инварианты, события. Переменные, как и константы, соответствуют математическим объектам: они могут быть множествами, бинарными отношениями, функциями, числами, принимать значения логического типа и т. д. Значение переменных формируют текущее состояние спецификации, а инварианты — предикаты, определенные на множестве переменных спецификации, — ограничивают его.</p>
+<p><img src="../images/fig4.1.svg" class="img-fluid"></p>
+<p>Рис. 4.1. Структура спецификации на Event-B</p>
+<p>Текущее состояние спецификации может быть изменено событием. Каждое событие обычно состоит из названия, параметров, охранных условий и действий. Охранные условия являются обязательными условиями в виде набора предикатов, ограничивающих множество возможных состояний спецификации, в которых данное событие может случиться. Типы параметров события также задаются в блоке охранных условий. Действия изменяют текущее состояние спецификации за счет модификации значения переменных спецификации. Определенные в машине инварианты должны сохраняться в результате любых модификаций значений переменных, поэтому корректность каждого изменения состояния необходимо доказывать.</p>
+<p>Верификация спецификаций на Event-B осуществляется при помощи формального математического доказательства с использованием включенных в состав платформы Rodin автоматических и интерактивных средств. Интерактивные средства позволяют проводить доказательства вручную, причем их корректность затем проверяется одним из компонентов платформы. Автоматическое же доказательство осуществляется средствами встроенных инструментов, а также SMT-решателями, которые добавляются в Rodin с помощью плагина, входящего в состав AstraVer Toolset. Возможна и комбинация интерактивного и автоматического доказательств, при которой утверждение для доказательства перед подачей на вход автоматическим инструментам сначала вручную разбивается на несколько более простых частных случаев.</p>
+<p>Для каждого требующего доказательства случая — неоднозначность выражений, сохранность инвариантов, корректность проведенного пошагового уточнения (если данная техника была использована) — Rodin генерирует соответствующие утверждения для доказательства, причем платформа решает проблему поддержки актуальности сгенерированных утверждений и выполненных доказательств в случае изменений в спецификации. Полное доказательство спецификации означает, что доказаны все сгенерированные утверждения.</p>
+</section>
+<section id="связь-элементов-мросл-дп-модели-и-элементов-event-b-спецификации" class="level2">
+<h2 class="anchored" data-anchor-id="связь-элементов-мросл-дп-модели-и-элементов-event-b-спецификации">4.2. Связь элементов МРОСЛ ДП-модели и элементов Event-B спецификации</h2>
+<p>Основными компонентами МРОСЛ ДП-модели, которые необходимо перевести на формализованный язык Event-B, являются определяемые в ней функции и множества (а также элементы этих множеств), условия консистентности и правила перехода системы из состояния в состояние. Функции и множества определяют множество всех возможных состояний системы <span class="math inline">G^*</span> , переход между которыми (то есть изменение значений данных функций и множеств) задается соответствующими правилами. Условия и требования формируют свойства, которые должны выполняться в каждом состоянии системы.</p>
+<p>Данные компоненты модели хорошо соответствуют конструкциям языка Event-B (рис. 4.2): требования и условия могут быть выражены в виде инвариантов, правила перехода системы из состояния в состояние — в виде событий, а определенные в модели множества и функции — в виде констант, множеств, переменных. Однако из-за особенностей Event-B некоторые компоненты МРОСЛ ДП-модели реализованы в спецификации иначе, а другие не реализованы совсем. Кроме того, в спецификации также присутствуют дополнительные элементы, введенные для упрощения записи некоторых свойств. Причины подобных исключений будут описаны далее в тексте данной главы.</p>
+<p><img src="../images/fig4.2.svg" class="img-fluid"></p>
+<p>Рис. 4.2. Соответствие между компонентами МРОСЛ ДП-модели и Event-B</p>
+</section>
+<section id="контекст" class="level2">
+<h2 class="anchored" data-anchor-id="контекст">4.3. Контекст</h2>
+<p>Начнем рассмотрение Event-B спецификации базового уровня МРОСЛ ДП-модели с контекста — части спецификации, в которой содержатся неизменяемые в процессе функционирования системы сущности — определения констант, множеств, аксиом.</p>
+<p>Первым определенным в контексте элементом является конечное (ключевое слово finite Event-B) множество Union, которое не имеет аналога в модели. Оно служит общим множеством, элементы которого могут быть сущностями, субъект-сессиями, ролями или административными ролями МРОСЛ ДП-модели. Другими словами, множество Union является базовым типом, который имеют элементы упомянутых выше множеств (в некотором смысле это аналог базового класса Object из языков программирования Java, C#):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">sets</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  Union</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UnionIsFinite</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">finite</span>(Union)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Каждой аксиоме поставлена в соответствие метка (в данном случае меткой является <span class="citation" data-cites="UnionIsFinite">@UnionIsFinite</span>), которая служит в качестве ее идентификатора. В Event-B метки присутствуют также у инвариантов, охранных условий и действий событий. Мы будем использовать данные метки, чтобы ссылаться на интересующие нас элементы спецификации.</p>
+<p>Следующим определяемым множеством является множество Names, которое соответствует множеству возможных имен сущностей, ролей, административных ролей NAMES модели NAMES модели (здесь и далее курсивом отмечаются элементы математической нотации МРОСЛ ДП-модели):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">sets</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  Names</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Множество Accesses соответствует множеству видов прав доступа <span class="math inline">R_a</span> . Элементы этого множества — это доступ на чтение ReadA ( <span class="math inline">read_a</span> в модели) и доступ на запись WriteA ( <span class="math inline">write_a</span> ), выражаемые в виде констант:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Accesses</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">constants</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  ReadA</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  WriteA</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@AccessesPartition</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">partition</span>(Accesses, {ReadA}, {WriteA})</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Предикат partition(S,x,y) является сокращенной формой записи утверждения, что некоторое множество S состоит из непересекающихся подмножеств x и y:</p>
+<p><span class="math display">S = x \cup y</span> <span class="math display">x \cap y = \emptyset</span></p>
+<p>То есть вместо одной аксиомы с меткой <span class="citation" data-cites="AccessesPartition">@AccessesPartition</span> можно было бы написать следующие две аксиомы, которые были бы ей эквивалентны (где <span class="math inline">\{ReadA\}</span> — множество из одного элемента):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@AccessesType1</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    Accesses <span class="op">=</span> {ReadA} <span class="op">∪</span> {WriteA}</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@AccessesType2</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    {ReadA} <span class="op">∩</span> {WriteA} <span class="op">=</span> <span class="cn">∅</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Множество AccessRights соответствует множеству видов доступа <span class="math inline">R_r</span> . Элементы этого множества — это право доступа на чтение Read <span class="math inline">(read_r)</span> , право доступа на запись Write <span class="math inline">(write_r)</span> , право доступа на выполнение Execute <span class="math inline">(execute_r)</span> , право доступа владения Own <span class="math inline">(own_r)</span> :</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">sets</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  AccessRights</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">constants</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  Read</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  Write</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  Execute</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  Own</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@AccessRightsPartition</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">partition</span>(AccessRights, {Read}, {Write}, {Execute}, {Own})</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Константа Root соответствует корневой сущности-контейнеру ROOT модели. Данная константа является элементом общего множества Union:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">constants</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  Root</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RootType</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    Root <span class="op">∈</span> Union</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Константа SRoot не имеет прямого аналога в модели. Она соответствует корневой субъект-сессии, т. е. субъект-сессии, которая является первой (или самой верхней) субъект-сессией в иерархии:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">constants</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  SRoot</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SRootType</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    SRoot <span class="op">∈</span> Union</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Константа SpecialAdmRoles соответствует множеству специальных административных ролей SAR. Элементами данного множества являются константы EntitiesAR (административная роль entities_admin_role), SubjectsAR (subjects_admin_role), UsersAR (users_admin_role), RolesAR (roles_admin_role), ARolesAR (admin_roles_admin_role).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">constants</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  SpecialAdmRoles</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  EntitiesAR</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  SubjectsAR</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  UsersAR</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  RolesAR</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  ARolesAR</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SpecialAdmRolesType</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    SpecialAdmRoles <span class="op">⊆</span> Union</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SpecialAdmRolesAreFinite</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">finite</span>(SpecialAdmRoles)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SpecialAdmRolesContent</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">partition</span>(SpecialAdmRoles, {EntitiesAR}, {SubjectsAR}, {UsersAR}, {RolesAR}, {ARolesAR})</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Хотя SpecialAdmRoles и является множеством, в спецификации оно объявлено как константа, так как множества (определяемые в блоке sets контекста) в Event-B по определению непересекающиеся и могут рассматриваться как аналоги типов. SpecialAdmRoles не является новым типом — далее можно будет увидеть, что оно является подмножеством множества административных ролей, которые в свою очередь являются подмножеством множества ролей, а множество ролей — подмножеством общего типа Union.</p>
+<p>Константа CommonRole описывает общую роль учетных записей пользователей <em>COMMON_ROLE</em> модели:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">constants</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  CommonRole</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CommonRoleType</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    CommonRole <span class="op">∈</span> Union</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Также в контексте присутствует одна из аксиом Пеано для натуральных чисел, которая используется в спецификации при доказательстве по индукции:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">axioms</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@InductionAxiom</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> s <span class="op">·</span> s <span class="op">⊆</span> <span class="cn">ℕ</span> <span class="op">∧</span> <span class="dv">0</span> <span class="op">∈</span> s <span class="op">∧</span> (<span class="op">∀</span> n <span class="op">·</span> n <span class="op">∈</span> s <span class="op">⇒</span> n <span class="op">+</span> <span class="dv">1</span> <span class="op">∈</span> s) <span class="op">⇒</span> <span class="cn">ℕ</span> <span class="op">⊆</span> s</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="машина" class="level2">
+<h2 class="anchored" data-anchor-id="машина">4.4. Машина</h2>
+<p>На этом разбор контекста спецификации завершен. Рассмотрим теперь динамическую часть спецификации, которая в Event-B называется машиной, а именно определенные в ней переменные, инварианты и события.</p>
+<section id="переменные-и-инварианты" class="level3">
+<h3 class="anchored" data-anchor-id="переменные-и-инварианты">4.4.1. Переменные и инварианты</h3>
+<p>Большинство переменных спецификации прямо соответствуют переменным, определенным в МРОСЛ ДП-модели, но кроме них в машине также присутствуют дополнительные переменные, заданные для удобства выражения некоторых свойств. Одной из подобных дополнительных переменных является CurrUnion, которая объединяет все текущие учетные записи пользователей (переменная UserAccs), субъект-сессии (Subjects), сущности (Entities) и роли (Roles) в единое общее множество, которое, в свою очередь, имеет тип Union. Данная переменная позволяет использовать в спецификации множество всех еще не созданных элементов Union. В качестве примера, немного забегая вперед, отметим, что данное множество используется в событии по созданию нового объекта create_object в качестве его типа.</p>
+<p>Каждой переменной обязательно соответствует один инвариант, в котором задается ее тип. Прочие инварианты, в тексте которых используется переменная, как правило, описывают ее свойства. Инварианты должны быть выполнены в каждом состоянии системы, и это является одним из основных свойств спецификации, которое требуется доказать на этапе ее верификации. В данном случае инвариант с меткой <span class="citation" data-cites="CurrUnionType">@CurrUnionType</span> задает тип переменной CurrUnion (подмножество определенного в контексте множества Union), а инвариант с меткой <span class="citation" data-cites="CurrUnionPartition">@CurrUnionPartition</span> — ее свойство (множество CurrUnion состоит из четырех непересекающихся подмножеств UserAccs, Subjects, Entities, Roles). При этом второй инвариант также является инвариантом, задающим тип для этих четырех переменных:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  CurrUnion</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  UserAccs <span class="co">// U: множество учетных записей пользователей</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  Subjects <span class="co">// S: множество субъект-сессий учетных записей</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  пользователей</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  Entities <span class="co">// E: множество сущностей</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  Roles <span class="co">// Общее множество для обычных и административных ролей,</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  не имеет прямого аналога в модели</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CurrUnionType</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    CurrUnion <span class="op">⊆</span> Union</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CurrUnionPartition</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">partition</span>(CurrUnion, UserAccs, Subjects, Entities, Roles)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>В виде комментариев рядом с именами переменных в секции variables приведены соответствующие им сущности из МРОСЛ ДП-модели.</p>
+<p>Множество сущностей Entities состоит из сущностей-объектов (переменная Objects) и сущностей-контейнеров (Containers). Аналогичным образом разделены роли: имеется общее множество ролей Roles, которое состоит из обычных (OrdRoles) и административных ролей (AdmRoles):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  Objects <span class="co">// О: множество объектов</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  Containers <span class="co">// С: множество контейнеров</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  OrdRoles <span class="co">// R: множество ролей</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  AdmRoles <span class="co">// AR: множество административных ролей</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntitiesPartition</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">partition</span>(Entities, Objects, Containers)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RolesPartition</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">partition</span>(Roles, AdmRoles, OrdRoles)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>В соответствии с текстом МРОСЛ ДП-модели множества учетных записей пользователей и субъект-сессий должны быть конечными (это учтено еще в контексте в аксиоме с меткой <span class="citation" data-cites="UnionIsFinite">@UnionIsFinite</span>) и непустыми:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAccsAreNotEmpty</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    UserAccs <span class="op">≠</span> <span class="cn">∅</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectsAreNotEmpty</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    Subjects <span class="op">≠</span> <span class="cn">∅</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция Direct ставит в соответствие каждой сущности и роли ее метку (<span class="citation" data-cites="DirectType">@DirectType</span>), которая может быть прямой (значение TRUE) или косвенной (FALSE).</p>
+<p>Для упрощения описания свойств функции Direct для каждой сущности определяется вспомогательная функция EntityMP, ставящая им в соответствие сущность-контейнер, которая называется точкой монтирования (<span class="citation" data-cites="EntityMPType">@EntityMPType</span>). Если метка сущности прямая, то ее точкой монтирования является корневой каталог (<span class="citation" data-cites="Direct1">@Direct1</span>), иначе — сущность-контейнер с прямой меткой (<span class="citation" data-cites="Direct2">@Direct2</span>), причем точка монтирования должна находиться выше в иерархии сущностей по отношению к ней (<span class="citation" data-cites="Direct6">@Direct6</span>).</p>
+<p>Если метка сущности-контейнера косвенная, то у всех сущностей, содержащихся в этой сущности-контейнере, должна быть косвенная метка (<span class="citation" data-cites="Direct4">@Direct4</span>). Если у некоторой сущности-контейнера mp метка прямая, а у одной из сущностей, содержащейся в mp, косвенная, то у всех сущностей, содержащихся в mp, метка косвенная (<span class="citation" data-cites="Direct5">@Direct5</span>), при этом mp является точкой монтирования для всех этих сущностей.</p>
+<p>Метка корневого каталога прямая (<span class="citation" data-cites="Direct7">@Direct7</span>).</p>
+<p>Если у роли имеется право доступа к сущности с косвенной меткой, то у нее должно быть такое же право доступа и к точке монтирования этой сущности, и наоборот (<span class="citation" data-cites="Direct8">@Direct8</span>, <span class="citation" data-cites="Direct9">@Direct9</span>).</p>
+<p>Точкой монтирования сущности с косвенной меткой является либо точка монтирования ее родителя (<span class="citation" data-cites="Direct10">@Direct10</span>), либо сам родитель (<span class="citation" data-cites="Direct11">@Direct11</span>).</p>
+<p>При этом метка каждой роли является прямой (<span class="citation" data-cites="Direct12">@Direct12</span>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  Direct   <span class="co">// direct: функция, задающая метку сущности - прямая или косвенная</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  EntityMP <span class="co">// вспомогательная функция, которая для каждой сущности с косвенной меткой ставит в соответствие точку монтирования (mount point)</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">@DirectType</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    Direct <span class="op">∈</span> Entities <span class="op">∪</span> Roles <span class="op">→</span> <span class="fu">BOOL</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntityMPType</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    EntityMP <span class="op">∈</span> Entities <span class="op">→</span> Containers</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct1</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>e <span class="op">·</span> e <span class="op">∈</span> Entities <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">⇒</span> EntityMP(e) <span class="op">=</span> Root</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct2</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>e <span class="op">·</span> e <span class="op">∈</span> Entities <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">⇒</span> Direct(EntityMP(e)) <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct3</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> Containers <span class="op">∧</span> Direct(c) <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">⇒</span> c <span class="op">∉</span> <span class="op">ran</span>(EntityMP)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct4</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e, p <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> p <span class="op">∈</span> <span class="op">dom</span>(EntityNames(e))</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> Direct(p) <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct5</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e, mp <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> mp <span class="op">∈</span> <span class="op">dom</span>(EntityNames(e))</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> Direct(mp) <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> (<span class="op">∀</span> child <span class="op">·</span> child <span class="op">∈</span> <span class="op">dom</span>(EntityNames)</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>          <span class="op">∧</span> mp <span class="op">∈</span> <span class="op">dom</span>(EntityNames(child))</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>            <span class="op">⇒</span> Direct(child) <span class="op">=</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct6</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e, p <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> p <span class="op">∈</span> <span class="op">dom</span>(EntityNames(e))</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> (<span class="op">∃</span>  E <span class="op">·</span> E <span class="op">⊆</span> Containers <span class="op">∧</span> Root <span class="op">∉</span> E <span class="op">∧</span> Parent[E] <span class="op">∪</span> {p} <span class="op">=</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>          E <span class="op">∪</span> {Root} <span class="op">∧</span> EntityMP(e) <span class="op">∈</span> E <span class="op">∪</span> {Root})</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct7</span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    Direct(Root) <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct8</span></span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e, a, r <span class="op">·</span> e <span class="op">∈</span> Entities <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> r <span class="op">∈</span> Roles</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> a <span class="op">∈</span> AccessRights <span class="op">∧</span> e <span class="op">↦</span> a <span class="op">∈</span> RoleRights(r)</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> EntityMP(e) <span class="op">↦</span> a <span class="op">∈</span> RoleRights(r)</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct9</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e, a, r <span class="op">·</span> e <span class="op">∈</span> Entities <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> r <span class="op">∈</span> Roles</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> a <span class="op">∈</span> AccessRights <span class="op">∧</span> EntityMP(e) <span class="op">↦</span> a <span class="op">∈</span> RoleRights(r)</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> e <span class="op">↦</span> a <span class="op">∈</span> RoleRights(r)</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct10</span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e, p <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> p <span class="op">∈</span> <span class="op">dom</span>(EntityNames(e))</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> Direct(p) <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> EntityMP(e) <span class="op">=</span> EntityMP(p)</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct11</span></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e, p <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> p <span class="op">∈</span> <span class="op">dom</span>(EntityNames(e))</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> Direct(e) <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> Direct(p) <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> EntityMP(e) <span class="op">=</span> p</span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">@Direct12</span></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> r <span class="op">·</span> r <span class="op">∈</span> Roles <span class="op">⇒</span> Direct(r) <span class="op">=</span> <span class="cn">TRUE</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция EntityNames определена для всех сущностей, за исключением корневого каталога, и ставит им в соответствие множество пар вида сущность-контейнер — имя, под которым сущность хранится в данной сущности-контейнере. Множество необходимо для поддержки механизма жестких ссылок: сущности-объекты могут храниться одновременно в нескольких сущностях-контейнерах или же в одной сущности-контейнере с разными именами.</p>
+<p>Функция Parent определена для всех сущностей-контейнеров, за исключением корневого каталога, и ставит им в соответствие другую сущность-контейнер, которая находится непосредственно выше в иерархии сущностей, т. е. родительский каталог.</p>
+<p>EntityNames должна удовлетворять следующим свойствам, выраженным в виде инвариантов:</p>
+<ul>
+<li>множество не может быть пустым, так как только у корневого каталога нет соответствующего родительского каталога (инвариант с меткой <span class="citation" data-cites="EntityNames1">@EntityNames1</span>);</li>
+<li>множество, соответствующее сущностям-контейнерам, должно состоять только из одной пары, так как жесткие ссылки на сущности-контейнеры не поддерживаются (<span class="citation" data-cites="EntityNames2">@EntityNames2</span>);</li>
+<li>две разные сущности не могут храниться в одной и той же сущности-контейнере с одинаковым именем (<span class="citation" data-cites="EntityNames3">@EntityNames3</span>).</li>
+</ul>
+<p>Инварианты с метками <span class="citation" data-cites="EntityNames4">@EntityNames4</span> и <span class="citation" data-cites="EntityNames5">@EntityNames5</span> устанавливают связь между функциями EntityNames и Parent. Без функции Parent вполне можно было бы обойтись, так как вся хранящаяся в ней информация об иерархии сущностей-контейнеров также присутствует и в функции EntityNames, однако функция Parent проще и с ее помощью многие свойства выражаются легче.</p>
+<p>Так, функцию Parent удобно использовать для выражения свойства отсутствия циклов в иерархии сущностей: если бы циклы присутствовали, то существовало бы такое множество сущностей-контейнеров, что разность этого множества и множества родительских каталогов этих сущностей была бы пустым множеством. Свойство отсутствия циклов является отрицанием данного утверждения и выражается в инварианте (<span class="citation" data-cites="NoCyclesForContainers">@NoCyclesForContainers</span>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  EntityNames <span class="co">// entity_name: функция имен сущностей в составе сущностей-контейнеров</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  Parent</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntityNamesType</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    EntityNames <span class="op">∈</span> Entities <span class="op">∖</span> {Root} <span class="op">→</span> (Containers <span class="op">↔</span> Names)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">@ParentType</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    Parent <span class="op">∈</span> Containers <span class="op">∖</span> {Root} <span class="op">→</span> Containers</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntityNames1</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">⇒</span> EntityNames(e) <span class="op">≠</span> <span class="cn">∅</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntityNames2</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> Containers <span class="op">∧</span> c <span class="op">≠</span> Root</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> (<span class="op">∃</span> p, n <span class="op">·</span> p <span class="op">∈</span> Containers <span class="op">∧</span> n <span class="op">∈</span> Names <span class="op">∧</span> EntityNames(c) <span class="op">=</span> {p <span class="op">↦</span> n})</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntityNames3</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> e1, e2 <span class="op">·</span> e1 <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> e2 <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> e1 <span class="op">≠</span> e2</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> EntityNames(e1) <span class="op">∩</span> EntityNames(e2) <span class="op">=</span> <span class="cn">∅</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntityNames4</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> c1, c2 <span class="op">·</span> c1 <span class="op">∈</span> Containers <span class="op">∧</span> c1 <span class="op">≠</span> Root <span class="op">∧</span> c2 <span class="op">∈</span> <span class="op">dom</span>(EntityNames(c1))</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> c2 <span class="op">=</span> Parent(c1)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">@EntityNames5</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> c1, c2 <span class="op">·</span> c1 <span class="op">∈</span> Containers <span class="op">∧</span> c1 <span class="op">≠</span> Root <span class="op">∧</span> c2 <span class="op">=</span> Parent(c1)</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> c2 <span class="op">∈</span> <span class="op">dom</span>(EntityNames(c1))</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">@NoCyclesForContainers</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> C <span class="op">·</span> C <span class="op">⊆</span> Containers <span class="op">∧</span> C <span class="op">≠</span> <span class="cn">∅</span> <span class="op">∧</span> Root <span class="op">∉</span> C <span class="op">⇒</span> C <span class="op">∖</span> Parent[C] <span class="op">≠</span> <span class="cn">∅</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция RoleAdmRights ставит в соответствие каждой административной роли множество пар вида роль — право доступа, которое имеет административная роль к данной роли. Данная функция имеет следующие свойства, выраженные в виде инвариантов:</p>
+<ul>
+<li>каждая административная роль имеет право доступа на выполнение к любой существующей роли (<span class="citation" data-cites="ExecuteToEverything">@ExecuteToEverything</span>);</li>
+<li>специальная административная роль RolesAR является владельцем для каждой обычной роли (<span class="citation" data-cites="RolesAR1">@RolesAR1</span>), причем она является единственным владельцем (<span class="citation" data-cites="RolesAR2">@RolesAR2</span>);</li>
+<li>специальная административная роль ARolesAR является владельцем для каждой административной роли (<span class="citation" data-cites="ARolesAR1">@ARolesAR1</span>), причем она является единственным владельцем (<span class="citation" data-cites="ARolesAR2">@ARolesAR2</span>);</li>
+<li>если административная роль обладает правом доступа на чтение к роли, то она обладает правом доступа на чтение и ко всем ролям ниже в ее иерархии (<span class="citation" data-cites="ReadSpreads">@ReadSpreads</span>).</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  RoleAdmRights <span class="co">// APA: функция административных прав доступа</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  к ролям и административным ролям административных ролей</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RoleAdmRightsType</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    RoleAdmRights <span class="op">∈</span> AdmRoles <span class="op">→</span> (Roles <span class="op">↔</span> AccessRights)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">@ExecuteToEverything</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> ar, r <span class="op">·</span> ar <span class="op">∈</span> AdmRoles <span class="op">∧</span> r <span class="op">∈</span> Roles</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> r <span class="op">↦</span> Execute <span class="op">∈</span> RoleAdmRights(ar)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RolesAR1</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> r <span class="op">·</span> r <span class="op">∈</span> OrdRoles</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> r <span class="op">↦</span> Own <span class="op">∈</span> RoleAdmRights(RolesAR)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RolesAR2</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> r, ar <span class="op">·</span> r <span class="op">∈</span> OrdRoles <span class="op">∧</span> ar <span class="op">∈</span> AdmRoles</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> r <span class="op">↦</span> Own <span class="op">∈</span> RoleAdmRights(ar)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> ar <span class="op">=</span> RolesAR</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">@ARolesAR1</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> r <span class="op">·</span> r <span class="op">∈</span> AdmRoles</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> r <span class="op">↦</span> Own <span class="op">∈</span> RoleAdmRights(ARolesAR)</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">@ARolesAR2</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> r, ar <span class="op">·</span> r <span class="op">∈</span> AdmRoles <span class="op">∧</span> ar <span class="op">∈</span> AdmRoles</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> r <span class="op">↦</span> Own <span class="op">∈</span> RoleAdmRights(ar)</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> ar <span class="op">=</span> ARolesAR</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">@ReadSpreads</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> ar, r, p <span class="op">·</span> ar <span class="op">∈</span> AdmRoles <span class="op">∧</span> r <span class="op">∈</span> Roles</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> p <span class="op">∈</span> Roles <span class="op">∧</span> p <span class="op">∈</span> RParents(r)</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> p <span class="op">↦</span> Read <span class="op">∈</span> RoleAdmRights(ar)</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> r <span class="op">↦</span> Read <span class="op">∈</span> RoleAdmRights(ar)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция RoleName определена для всех ролей и ставит им в соответствие их имя. Данное имя должно быть уникально: не должно существовать двух различных ролей с одинаковым именем, так что в Event-B данная функция определена как тотальная инъекция (символ <span class="math inline">\mapsto</span> ). Совместно с функцией RParents функция RoleName реализует функцию МРОСЛ ДП-модели role_name: функцию имен ролей и административных ролей в составе роли или административной роли.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  RoleName</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RoleNameType</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    RoleName <span class="op">∈</span> Roles <span class="op">↣</span> Names</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция RoleRights ставит в соответствие для каждой роли множество пар вида сущность — право доступа, которое имеет роль к данной сущности. С переменной RoleRights связано следующее свойство: у каждой сущности может быть только одна роль-владелец:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  RoleRights <span class="co">// PA: функция прав доступа к сущностям ролей и административных ролей</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RoleRightsType</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    RoleRights <span class="op">∈</span> Roles <span class="op">→</span> (Entities <span class="op">↔</span> AccessRights)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">@NoMultipleOwners</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> r1, r2, e <span class="op">·</span> r1 <span class="op">∈</span> Roles <span class="op">∧</span> r2 <span class="op">∈</span> Roles <span class="op">∧</span> e <span class="op">↦</span> Own <span class="op">∈</span> RoleRights(r1)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> e <span class="op">↦</span> Own <span class="op">∈</span> RoleRights(r2)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> r1 <span class="op">=</span> r2</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Константа Root, соответствующая корневому каталогу, является элементом множества текущих сущностей-контейнеров:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RootType</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    Root <span class="op">∈</span> Containers</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция RParents определена для всех ролей и ставит им в соответствие множество родительских ролей, в которых они непосредственно содержатся. Множество необходимо по той причине, что одна роль может одновременно содержаться в нескольких других ролях. Не у всех ролей есть родительская роль, так что поставленное в соответствие множество может быть пустым. С переменной RParents связаны следующие инварианты:</p>
+<ul>
+<li>иерархии обычный ролей и административных ролей независимы (<span class="citation" data-cites="RParents1">@RParents1</span> и <span class="citation" data-cites="RParents2">@RParents2</span>);</li>
+<li>в иерархии ролей нет циклов (<span class="citation" data-cites="NoCyclesForRoles">@NoCyclesForRoles</span>).</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  RParents</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RParentsType</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    RParents <span class="op">∈</span> Roles <span class="op">→</span> <span class="op">ℙ</span>(Roles)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RParents1</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>r <span class="op">·</span> r <span class="op">∈</span> AdmRoles <span class="op">⇒</span> RParents(r) <span class="op">⊆</span> AdmRoles</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RParents2</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>r <span class="op">·</span> r <span class="op">∈</span> OrdRoles <span class="op">⇒</span> RParents(r) <span class="op">⊆</span> OrdRoles</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">@NoCyclesForRoles</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>R <span class="op">·</span> R <span class="op">⊆</span> Roles <span class="op">∧</span> R <span class="op">≠</span> <span class="cn">∅</span> <span class="op">⇒</span> (<span class="op">∃</span>r <span class="op">·</span> r <span class="op">∈</span> R <span class="op">∧</span> (<span class="op">∀</span>p <span class="op">·</span> p <span class="op">∈</span> R <span class="op">⇒</span> p <span class="op">∉</span> RParents(r)))</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция Shared определена на множествах сущностей-контейнеров и субъект-сессий и задает, являются ли элементы этих множеств разделяемыми контейнерами. Если бы множества Containers и Roles не были бы подмножествами общего множества-типа Union, определенного в контексте, то Event-B не позволил бы использовать в записи инварианта операцию объединения этих множеств. Каждая роль должна являться разделяемым контейнером:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  Shared <span class="co">// shared_container: функция разделяемых записей контейнеров</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SharedType</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    Shared <span class="op">∈</span> Containers <span class="op">∪</span> Roles <span class="op">→</span> <span class="fu">BOOL</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RolesAreShared</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>r <span class="op">·</span> r <span class="op">∈</span> Roles <span class="op">⇒</span> Shared(r) <span class="op">=</span> <span class="cn">TRUE</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция SParent определена для всех субъект-сессий, за исключением корневой сессии, и ставит им в соответствие другую субъект-сессию, которая находится непосредственно выше в иерархии субъект-сессий. Также на иерархии субъект-сессий должны отсутствовать циклы:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  SParent</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SParentType</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    SParent <span class="op">∈</span> Subjects <span class="op">∖</span> {SRoot} <span class="op">→</span> Subjects</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">@NoCyclesForSubjects</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>S <span class="op">·</span> S <span class="op">⊆</span> <span class="op">dom</span>(SParent) <span class="op">∧</span> S <span class="op">≠</span> <span class="cn">∅</span> <span class="op">⇒</span> S <span class="op">∖</span> SParent[S] <span class="op">≠</span> <span class="cn">∅</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Определенное в контексте в виде константы множество Special-AdmRoles должно быть подмножеством множества административных ролей:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SpecialAdmRolesType</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    SpecialAdmRoles <span class="op">⊆</span> AdmRoles</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Константа SRoot, в свою очередь, является элементом множества текущих субъект-сессий:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SRootType</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    SRoot <span class="op">∈</span> Subjects</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция SubjectAccesses описывает доступы субъект-сессий к сущностям: для каждой субъект-сессии ставится в соответствие множество упорядоченных пар вида сущность — доступ, который субъект-сессия имеет к данной сущности:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  SubjectAccesses   <span class="co">// A: функция доступов субъект-сессий к сущностям</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectAccessesType</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    SubjectAccesses <span class="op">∈</span> Subjects <span class="op">→</span> (Entities <span class="op">↔</span> Accesses)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция SubjectAdmAccesses описывает доступы субъект-сессий к ролям: для каждой субъект-сессии ставится в соответствие множество упорядоченных пар вида роль — доступ, который субъект-сессия имеет к данной роли:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  SubjectAdmAccesses   <span class="co">// AA: функция доступов субъект-сессий к ролям или административным ролям</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectAdmAccessesType</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    SubjectAdmAccesses <span class="op">∈</span> Subjects <span class="op">→</span> (Roles <span class="op">↔</span> Accesses)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Частичная функция SubjectOwner ставит в соответствие для некоторых субъект-сессий роль, которая имеет право доступа владения к данной сессии. Функция определена не для всех субъект-сессий, так как не у каждой субъект-сессии есть владелец:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  SubjectOwner   <span class="co">// PA: частный случай функции PA, только для сессий и правда доступа владения</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectOwnerType</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    SubjectOwner <span class="op">∈</span> Subjects ⇸ Roles</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функция SubjectUser ставит в соответствие каждой субъект-сессии учетную запись пользователя, от имени которой она действует:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  SubjectUser   <span class="co">// user: функция принадлежности субъект-сессии учетной записи пользователя</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@SubjectUserType</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    SubjectUser <span class="op">∈</span> Subjects <span class="op">→</span> UserAccs</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Функции UserAdmRole и UserOrdRole определены для каждой учетной записи пользователя и ставят им в соответствие индивидуальную административную роль и индивидуальную обычную роль соответственно (<span class="citation" data-cites="UserAdmRoleType">@UserAdmRoleType</span>, <span class="citation" data-cites="UserOrdRoleType">@UserOrdRoleType</span>). Индивидуальные роли пользователя должны содержаться в иерархии ролей независимо, т. е. у них не должно быть ни родителей, ни потомков (<span class="citation" data-cites="UserAdmRole1">@UserAdmRole1</span>, <span class="citation" data-cites="UserAdmRole2">@UserAdmRole2</span>, <span class="citation" data-cites="UserOrdRole1">@UserOrdRole1</span>, <span class="citation" data-cites="UserOrdRole2">@UserOrdRole2</span>). Одна роль не может быть индивидуальной ролью сразу нескольких учетных записей пользователей (<span class="citation" data-cites="UserAdmRole3">@UserAdmRole3</span>, <span class="citation" data-cites="UserOrdRole3">@UserOrdRole3</span>). Индивидуальная административная роль пользователя не должна быть специальной административной ролью (<span class="citation" data-cites="UserAdmRole4">@UserAdmRole4</span>). Кроме того, индивидуальная административная роль учетной записи пользователя должна обладать правами доступа на чтение и на запись как к самой себе, так и к индивидуальной обычной роли учетной записи пользователя (<span class="citation" data-cites="UserAdmRole5">@UserAdmRole5</span>, <span class="citation" data-cites="UserAdmRole6">@UserAdmRole6</span>, <span class="citation" data-cites="UserOrdRole4">@UserOrdRole4</span>, <span class="citation" data-cites="UserOrdRole5">@UserOrdRole5</span>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">variables</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  UserAdmRole   <span class="co">// u_admin: индивидуальная административная роль учетной записи пользователя</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  UserOrdRole   <span class="co">// u_c: индивидуальная роль учетной записи пользователя</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAdmRoleType</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    UserAdmRole <span class="op">∈</span> UserAccs <span class="op">→</span> AdmRoles</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserOrdRoleType</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    UserOrdRole <span class="op">∈</span> UserAccs <span class="op">→</span> OrdRoles</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAdmRole1</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u <span class="op">·</span> u <span class="op">∈</span> UserAccs <span class="op">⇒</span> RParents(UserAdmRole(u)) <span class="op">=</span> <span class="cn">∅</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAdmRole2</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>  u,  r <span class="op">·</span> u <span class="op">∈</span> UserAccs <span class="op">∧</span> r <span class="op">∈</span> Roles <span class="op">⇒</span> UserAdmRole(u) <span class="op">∉</span> RParents(r)</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAdmRole3</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>   u1,   u2 <span class="op">·</span> u1 <span class="op">∈</span> UserAccs   <span class="op">∧</span>   u2 <span class="op">∈</span> UserAccs   <span class="op">∧</span>   u1 <span class="op">≠</span> u2</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> UserAdmRole(u1) <span class="op">≠</span> UserAdmRole(u2)</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAdmRole4</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>  u <span class="op">·</span> u <span class="op">∈</span> UserAccs <span class="op">⇒</span> UserAdmRole(u) <span class="op">∉</span> SpecialAdmRoles</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAdmRole5</span></span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u <span class="op">·</span> u <span class="op">∈</span> UserAccs</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> UserAdmRole(u) <span class="op">↦</span> Read <span class="op">∈</span> RoleAdmRights(UserAdmRole(u))</span>
+<span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserAdmRole6</span></span>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>  u <span class="op">·</span> u <span class="op">∈</span> UserAccs</span>
+<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> UserAdmRole(u) <span class="op">↦</span> Write <span class="op">∈</span> RoleAdmRights(UserAdmRole(u))</span>
+<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserOrdRole1</span></span>
+<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u <span class="op">·</span> u <span class="op">∈</span> UserAccs <span class="op">⇒</span> RParents(UserOrdRole(u)) <span class="op">=</span> <span class="cn">∅</span></span>
+<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserOrdRole2</span></span>
+<span id="cb31-27"><a href="#cb31-27" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u, r <span class="op">·</span> u <span class="op">∈</span> UserAccs <span class="op">∧</span> r <span class="op">∈</span> Roles <span class="op">⇒</span> UserOrdRole(u) <span class="op">∉</span> RParents(r)</span>
+<span id="cb31-28"><a href="#cb31-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserOrdRole3</span></span>
+<span id="cb31-29"><a href="#cb31-29" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u1, u2 <span class="op">·</span> u1 <span class="op">∈</span> UserAccs <span class="op">∧</span> u2 <span class="op">∈</span> UserAccs <span class="op">∧</span> u1 <span class="op">≠</span> u2</span>
+<span id="cb31-30"><a href="#cb31-30" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> UserOrdRole(u1) <span class="op">≠</span> UserOrdRole(u2)</span>
+<span id="cb31-31"><a href="#cb31-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserOrdRole4</span></span>
+<span id="cb31-32"><a href="#cb31-32" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u <span class="op">·</span> u <span class="op">∈</span> UserAccs</span>
+<span id="cb31-33"><a href="#cb31-33" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> UserOrdRole(u) <span class="op">↦</span> Read <span class="op">∈</span> RoleAdmRights(UserAdmRole(u))</span>
+<span id="cb31-34"><a href="#cb31-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">@UserOrdRole5</span></span>
+<span id="cb31-35"><a href="#cb31-35" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>  u <span class="op">·</span> u <span class="op">∈</span> UserAccs</span>
+<span id="cb31-36"><a href="#cb31-36" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> UserOrdRole(u) <span class="op">↦</span> Write <span class="op">∈</span> RoleAdmRights(UserAdmRole(u))</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Общая роль CommonRole является обычной ролью (<span class="citation" data-cites="CommonRoleType">@CommonRoleType</span>). Общая роль находится в иерархии ролей независимо от прочих ролей (<span class="citation" data-cites="CommonRole1">@CommonRole1</span>, <span class="citation" data-cites="CommonRole2">@CommonRole2</span>). Общая роль не может быть индивидуальной ролью какой-либо учетной записи пользователя (<span class="citation" data-cites="CommonRole3">@CommonRole3</span>). Кроме того, индивидуальная административная роль каждой учетной записи пользователя должна обладать правами доступа на чтение и на запись к общей роли CommonRole (<span class="citation" data-cites="CommonRole4">@CommonRole4</span>, <span class="citation" data-cites="CommonRole5">@CommonRole5</span>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CommonRoleType</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    CommonRole <span class="op">∈</span> OrdRoles</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CommonRole1</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    RParents(CommonRole) <span class="op">=</span> <span class="cn">∅</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CommonRole2</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> r <span class="op">·</span> r <span class="op">∈</span> Roles <span class="op">⇒</span> CommonRole <span class="op">∉</span> RParents(r)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CommonRole3</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u <span class="op">·</span> u <span class="op">∈</span> UserAccs <span class="op">⇒</span> CommonRole <span class="op">≠</span> UserOrdRole(u)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CommonRole4</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u <span class="op">·</span> u <span class="op">∈</span> UserAccs</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> CommonRole <span class="op">↦</span> Read <span class="op">∈</span> RoleAdmRights(UserAdmRole(u))</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">@CommonRole5</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span> u <span class="op">·</span> u <span class="op">∈</span> UserAccs</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> CommonRole <span class="op">↦</span> Write <span class="op">∈</span> RoleAdmRights(UserAdmRole(u))</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="событие-инициализации" class="level3">
+<h3 class="anchored" data-anchor-id="событие-инициализации">4.4.2. Событие инициализации</h3>
+<p>В Event-B достижимыми называются состояния, в которых система может оказаться при переходах из некоторого начального состояния в результате выполнения произвольных последовательностей описанных в спецификации событий. Начальное состояние при этом задается событием инициализации. В спецификации базового уровня МРОСЛ ДП-модели событие инициализации на данный момент не реализовано. Поэтому для подтверждения корректности спецификации вместо доказательства сохранности инвариантов в каждом достижимом состоянии проводится доказательство сохранности инвариантов при каждом переходе от одного возможного состояния к другому возможному, где под возможным состоянием подразумевается любое состояние, при котором определенные в спецификации инварианты были бы выполнены.</p>
+</section>
+<section id="реализация-правила-перехода-системы-из-состояния-в-состояние-в-виде-события" class="level3">
+<h3 class="anchored" data-anchor-id="реализация-правила-перехода-системы-из-состояния-в-состояние-в-виде-события">4.4.3. Реализация правила перехода системы из состояния в состояние в виде события</h3>
+<p>Рассмотрим пример реализации одного из правил перехода системы из состояния в состояние МРОСЛ ДП-модели в виде Event-B события — правила <span class="math inline">delete\_subject</span> (табл. 4.1).</p>
+<p>Таблица 4.1. Правило перехода системы из состояния в состояние <em>delete_subject</em></p>
+<div class="dejure-table">
+<div class="dejure-head">
+<div class="dejure-h-pre">
+<p>Исходное состояние <span class="math inline">G</span></p>
+</div>
+<div class="dejure-h-post">
+<p>Результирующее состояние <span class="math inline">G'</span></p>
+</div>
+</div>
+<div class="dejure-rule">
+<div class="dejure-name">
+<p><strong>delete_subject(x, z)</strong></p>
+</div>
+<div class="dejure-grid">
+<div class="dejure-pre">
+<p><em>Исходное состояние <span class="math inline">G</span>:</em></p>
+<ol type="1">
+<li><span class="math inline">x, z \in S</span>;</li>
+<li><span class="math inline">H_{S}(z) = \emptyset</span>;</li>
+<li>существует <span class="math inline">r \in R \cup AR</span>: <span class="math inline">(x, r, read_{a}) \in AA</span>, <span class="math inline">(z, own_{r}) \in PA(r)</span>.</li>
+</ol>
+</div>
+<div class="dejure-post">
+<p><em>Результирующее состояние <span class="math inline">G'</span>:</em></p>
+<ol type="1">
+<li><span class="math inline">S' = S \setminus \{z\}</span>;</li>
+<li><span class="math inline">AA' = AA \setminus \{(z, r, \alpha_{a}): r \in R \cup AR, \alpha_{a} \in R_{a}\}</span>;</li>
+<li><span class="math inline">A' = A \setminus \{(z, e, \alpha_{a}): e \in E, \alpha_{a} \in R_{a}\}</span>;</li>
+<li>для <span class="math inline">r \in R \cup AR</span> выполняется <span class="math inline">PA'(r) = PA(r) \setminus \{(z, own_{r})\}</span>;</li>
+<li>для <span class="math inline">z' \in S</span> такой, что <span class="math inline">z \in H_{S}(z')</span>, справедливо равенство <span class="math inline">H_{S}'(z') = H_{S}(z') \setminus \{z\}</span>.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<p>Правило delete_subject обладает двумя параметрами (x и z), пронумерованным множеством предусловий (левая часть таблицы) и пронумерованным множеством постусловий (правая часть таблицы). События Event-B устроены схожим образом: событие может иметь параметры, блок охранных условий (аналог предусловий) и блок действий, в котором осуществляется изменение значений определенных в спецификации переменных.</p>
+<p>Второе предусловие требует отсутствия у удаляемой субъект-сессии z потомков в иерархии субъект-сессий (в противном случае удаление надо начинать с них). На Event-B спецификации иерархия субъект-сессий реализована обратной функцией SParent, так что соответствующее условие <span class="citation" data-cites="grd4">@grd4</span> требует, чтобы удаляемая субъект-сессия delSubject не являлась родителем ни для какой другой субъект-сессии.</p>
+<p>Третье предусловие требует наличия у субъект-сессии x доступа на чтение к роли с правом доступа владения к удаляемой субъект-сессии z. На Event-B спецификации права доступа владения к субъект-сессиям реализуются отдельной частичной функцией Subject-Owner. Так как функция частичная, то требование существования роли-владельца сводится к требованию принадлежности субъект-сессии к ее множеству определения (охранное условие <span class="citation" data-cites="grd5">@grd5</span>). Требование наличия доступа на чтение выражается в условии <span class="citation" data-cites="grd6">@grd6</span>.</p>
+<p>В правиле перехода системы из состояния в состояние <span class="math inline">delete\_subject</span> также присутствует пять постусловий, которые описывают удаление всякого упоминания субъект-сессии z из переменных состояния. Первому постусловию соответствуют действия события с метками <span class="citation" data-cites="act1">@act1</span> и <span class="citation" data-cites="act2">@act2</span> (все элементы множества Subjects также являются элементами общего множества CurrUnion, которого нет в МРОСЛ ДП-модели). Второе и третье постусловия описывают удаление всех доступов, которые имела удаляемая субъект-сессия к ролям и сущностям — <span class="citation" data-cites="act4">@act4</span> и <span class="citation" data-cites="act6">@act6</span>. Удаление информации о роли-владельце из четвертого постусловия осуществляется в действии <span class="citation" data-cites="act5">@act5</span>. Обновление иерархии субъект-сессий из пятого постусловия — в <span class="citation" data-cites="act6">@act6</span>.</p>
+<p>Необъясненным осталось только охранное условие с меткой <span class="citation" data-cites="grd3">@grd3</span>, которое требует, чтобы удаляемая субъект-сессия не была корневой субъект-сессией. Понятие корневой субъект-сессии отсутствует в МРОСЛ ДП-модели, оно было добавлено в Event-B спецификацию исключительно для облегчения выражения некоторых связанных с иерархией субъект-сессий свойств.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">event</span> delete_subject</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">any</span> subject delSubject</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd1</span> subject <span class="op">∈</span> Subjects</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd2</span> delSubject <span class="op">∈</span> Subjects</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd3</span> delSubject <span class="op">≠</span> SRoot</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd4</span> <span class="op">∀</span> s <span class="op">·</span> s <span class="op">∈</span> <span class="op">dom</span>(SParent) <span class="op">⇒</span> SParent(s) <span class="op">≠</span> delSubject</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd5</span> delSubject <span class="op">∈</span> <span class="op">dom</span>(SubjectOwner)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd6</span> SubjectOwner(delSubject) <span class="op">↦</span> ReadA <span class="op">∈</span> SubjectAdmAccesses(subject)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act1</span> CurrUnion <span class="op">:=</span> CurrUnion <span class="op">∖</span> {delSubject}</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act2</span> Subjects <span class="op">:=</span> Subjects <span class="op">∖</span> {delSubject}</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act3</span> SubjectUser <span class="op">:=</span> {delSubject} ⩤ SubjectUser</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act4</span> SubjectAccesses <span class="op">:=</span> {delSubject} ⩤ SubjectAccesses</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act5</span> SubjectOwner <span class="op">:=</span> {delSubject} ⩤ SubjectOwner</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act6</span> SubjectAdmAccesses <span class="op">:=</span> {delSubject} ⩤ SubjectAdmAccesses</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act7</span> SParent <span class="op">:=</span> {delSubject} ⩤ SParent</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="использование-вспомогательных-параметров" class="level3">
+<h3 class="anchored" data-anchor-id="использование-вспомогательных-параметров">4.4.4. Использование вспомогательных параметров</h3>
+<p>Предусловия и постусловия правила перехода системы из состояния в состояние МРОСЛ ДП-модели <span class="math inline">delete\_subject</span> достаточно просты и транслируются на Event-B без заметных изменений. Однако ситуация обстоит несколько иначе с некоторыми другими правилами. Рассмотрим пример правила перехода системы из состояния в состояние <span class="math inline">create\_object</span> (табл. 4.2).</p>
+<p>Таблица 4.2. Правило перехода системы из состояния в состояние <em>create_object</em></p>
+<div class="dejure-table">
+<div class="dejure-head">
+<div class="dejure-h-pre">
+<p>Исходное состояние <span class="math inline">G</span></p>
+</div>
+<div class="dejure-h-post">
+<p>Результирующее состояние <span class="math inline">G'</span></p>
+</div>
+</div>
+<div class="dejure-rule">
+<div class="dejure-name">
+<p><strong>create_object(x, y, yd, name, z)</strong></p>
+</div>
+<div class="dejure-grid">
+<div class="dejure-pre">
+<p><em>Исходное состояние <span class="math inline">G</span>:</em></p>
+<ol type="1">
+<li><span class="math inline">x \in S</span>;</li>
+<li><span class="math inline">y \notin E</span>;</li>
+<li><span class="math inline">z \in C</span>;</li>
+<li><span class="math inline">[(x, z, write_{a}) \in A</span>, существует <span class="math inline">r \in R \cup AR</span> такая, что <span class="math inline">(x, r, read_{a}) \in AA</span> и <span class="math inline">(z, execute_{r}) \in PA(r)]</span>;</li>
+<li><span class="math inline">name \in NAME \setminus (\{“”\} \cup \{entity\_name(z, y'): y' \in H_{E}(z)\})</span>;</li>
+<li><span class="math inline">(x, user(x)\_c, write_{a}) \in AA</span>;</li>
+<li><span class="math inline">H_{E}(z) = \{y' \in H_{E}(z): direct(y') = yd\}</span>;</li>
+<li>[если <span class="math inline">yd = true</span>, то <span class="math inline">direct(z) = true</span>].</li>
+</ol>
+</div>
+<div class="dejure-post">
+<p><em>Результирующее состояние <span class="math inline">G'</span>:</em></p>
+<ol type="1">
+<li><span class="math inline">E' = E \cup \{y\}</span> <span class="math inline">(O' = O \cup \{y\}, C' = C)</span>;</li>
+<li><span class="math inline">entity\_name'(z, y) = \{name\}</span>;</li>
+<li><span class="math inline">direct'(y) = yd</span>;</li>
+<li>если <span class="math inline">yd = true</span>, то <span class="math inline">PA'(user(x)\_c) = PA(user(x)\_c) \cup \{(y, own_{r})\}</span>; если <span class="math inline">yd = false</span> и <span class="math inline">c \in C</span> такая, что <span class="math inline">direct(c) = true</span>, <span class="math inline">H_{E}(c) = \{y' \in H_{E}(y): direct(y') = false\}</span> и <span class="math inline">y &lt; c</span>, то для всех <span class="math inline">r' \in R \cup AR</span> выполняется <span class="math inline">PA'(r') = PA(r') \cup \{(y, \alpha_{rj}): (c, \alpha_{rj}) \in PA(r')\}</span>;</li>
+<li><span class="math inline">H_{E}'(z) = H_{E}(z) \cup \{y\}</span>, <span class="math inline">H_{E}'(y) = \emptyset</span>.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<p>Постусловие номер 4 правила <span class="math inline">create\_object</span> описывает изменение функции PA. Данное описание включает в себя большое число различных условий и достаточно сложно, чтобы его можно было выразить в виде действий Event-B события, которые в основном выглядят как простые присваивания. Существует два способа решения данной проблемы. Первый — использование нотации задания множества вида <span class="math inline">\{x \mid P\}</span> , с помощью которой можно задать множество, состоящее из всех элементов x, удовлетворяющих предикату P. Пример использования — присваивание переменной S множества, состоящего из всех таких элементов x, которые либо принадлежат множеству A, либо множеству B:</p>
+<p><span class="math display">S := \{ x \mid x \in A \lor x \in B \}.</span></p>
+<p>В данном конкретном случае можно было вполне обойтись без нотации задания множества и напрямую присвоить переменной S объединение множеств A и B:</p>
+<p><span class="math display">S := A \cup B.</span></p>
+<p>В случае с четвертым постусловием правила <span class="math inline">create\_object</span> подобной простой альтернативы нет, а предикат P будет заметно сложней: на самом деле он станет настолько сложным, что в нем будет весьма затруднительно разобраться, и особенно заметно усложнится процесс доказательства сохранности инвариантов, в которых присутствует измененная переменная.</p>
+<p>Второй способ заключается в объявлении вспомогательного параметра события, значение которого присваивается нужной переменной в виде действия Event-B события. При этом в виде охранных условий на значение объявленного параметра описываются свойства, которым должно соответствовать новое значение переменной, а также связь между текущим и новым значениями. В данном способе единый предикат P, о котором шла речь выше, разбивается на отдельные охранные условия, работать с которыми становится проще.</p>
+<p>Второй способ хорошо себя зарекомендовал и широко применяется в Event-B спецификации МРОСЛ ДП-модели. Рассмотрим его на примере параметра roleRights события <span class="math inline">create\_object</span> , который был добавлен для описания постусловия номер 4 правила <span class="math inline">create\_object</span> .</p>
+<p>Охранное условие с меткой <span class="citation" data-cites="grd17">@grd17</span> задает тип параметра. Так как значение параметра впоследствии будет присвоено переменной RoleRights в действии <span class="citation" data-cites="act5">@act5</span>, то задаваемый тип должен соответствовать типу переменной. Тип переменной RoleRights — функция, ставящая в соответствие для каждой роли множество пар вида сущность — право доступа. Так как в результате выполнения события</p>
+<p>create_object множество сущностей Entities изменится — в него добавится только что созданный объект, а множество сущностей Entities присутствует в описании типа переменной RoleRights, то в описании типа параметра roleRights нужно учесть данное изменение: вместо множества Entities использовать его новое значение, а именно объединение множества Entities и создаваемого объекта object. Все это учтено в задающем тип параметра охранном условии <span class="citation" data-cites="grd17">@grd17</span>.</p>
+<p>Все изменения переменной RoleRights, описанные в постусловии номер 4, касаются добавления некоторым ролям прав доступа к создаваемому объекту object. Данные изменения выражаются в виде охранных условий <span class="citation" data-cites="grd19-21">@grd19-21</span> на параметр roleRights.</p>
+<p>Права доступа ко всем сущностям, за исключением объекта object, имеющиеся у ролей на момент до события create_object, должны остаться неизменны после присваивания переменной RoleRights значения параметра roleRights. Данная связь описывается в охранном условии <span class="citation" data-cites="grd18">@grd18</span>.</p>
+<p>В действии <span class="citation" data-cites="act5">@act5</span> происходит присваивание переменной Role-Rights значения параметра roleRights, который был подробно описан в охранных условиях.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">event</span> create_object</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">any</span> subject object parent name role dLabel mountPoint roleRights depth</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd1</span> object <span class="op">∈</span> Union <span class="op">∖</span> CurrUnion</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd2</span> subject <span class="op">∈</span> Subjects</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd3</span> parent <span class="op">∈</span> Containers</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd4</span> parent <span class="op">↦</span> WriteA <span class="op">∈</span> SubjectAccesses(subject)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd5</span> <span class="op">∃</span> r <span class="op">·</span> r <span class="op">∈</span> Roles <span class="op">∧</span> r <span class="op">↦</span> ReadA <span class="op">∈</span> SubjectAdmAccesses(subject)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> parent <span class="op">↦</span> Execute <span class="op">∈</span> RoleRights(r)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd6</span> name <span class="op">∈</span> Names</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd7</span> <span class="op">∀</span> e <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames)</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> parent <span class="op">↦</span> name <span class="op">∉</span> EntityNames(e)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd8</span> role <span class="op">=</span> UserOrdRole(SubjectUser(subject))</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd9</span> role <span class="op">↦</span> WriteA <span class="op">∈</span> SubjectAdmAccesses(subject)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd10</span> mountPoint <span class="op">∈</span> Containers</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd11</span> dLabel <span class="op">∈</span> <span class="fu">BOOL</span></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd12</span> <span class="op">∀</span> e <span class="op">·</span> e <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> parent <span class="op">∈</span> <span class="op">dom</span>(EntityNames(e))</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> Direct(e) <span class="op">=</span> dLabel</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd13</span> dLabel <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">⇒</span> Direct(parent) <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd14</span> dLabel <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">⇒</span> mountPoint <span class="op">=</span> Root</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd15</span> dLabel <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> Direct(parent) <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> mountPoint <span class="op">=</span> EntityMP(parent)</span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd16</span> dLabel <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">∧</span> Direct(parent) <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> mountPoint <span class="op">=</span> parent</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd17</span> roleRights <span class="op">∈</span> Roles <span class="op">→</span> (Entities <span class="op">∪</span> {object} <span class="op">↔</span> AccessRights)</span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd18</span> <span class="op">∀</span> e, a, r <span class="op">·</span> e <span class="op">∈</span> Entities <span class="op">∧</span> a <span class="op">∈</span> AccessRights <span class="op">∧</span> r <span class="op">∈</span> Roles</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> (e <span class="op">↦</span> a <span class="op">∈</span> roleRights(r) <span class="op">↔</span> e <span class="op">↦</span> a <span class="op">∈</span> RoleRights(r))</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd19</span> dLabel <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">⇒</span> object <span class="op">↦</span> Own <span class="op">∈</span> roleRights(role)</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd20</span> dLabel <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> (<span class="op">∀</span> a, r <span class="op">·</span> a <span class="op">∈</span> AccessRights <span class="op">∧</span> r <span class="op">∈</span> Roles</span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>        <span class="op">∧</span> object <span class="op">↦</span> a <span class="op">∈</span> roleRights(r)</span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>          <span class="op">⇒</span> a <span class="op">=</span> Own <span class="op">∧</span> r <span class="op">=</span> role)</span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd21</span> dLabel <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> (<span class="op">∀</span> a, r <span class="op">·</span> a <span class="op">∈</span> AccessRights <span class="op">∧</span> r <span class="op">∈</span> Roles</span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> (mountPoint <span class="op">↦</span> a <span class="op">∈</span> RoleRights(r)</span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>          <span class="op">⇔</span> object <span class="op">↦</span> a <span class="op">∈</span> roleRights(r)))</span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd22</span> depth <span class="op">∈</span> <span class="cn">ℕ</span> <span class="op">→</span> <span class="op">ℙ</span>(Containers)</span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd23</span> <span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> Containers <span class="op">⇒</span> (<span class="op">∃</span> i <span class="op">·</span> i <span class="op">∈</span> <span class="cn">ℕ</span> <span class="op">∧</span> c <span class="op">∈</span> depth(i))</span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd24</span> depth(<span class="dv">0</span>) <span class="op">=</span> {Root}</span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd25</span> <span class="op">∀</span> i <span class="op">·</span> i <span class="op">∈</span> <span class="cn">ℕ</span> <span class="op">∧</span> i <span class="op">≠</span> <span class="dv">0</span> <span class="op">⇒</span> (<span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> depth(i) <span class="op">⇒</span> c <span class="op">≠</span> Root)</span>
+<span id="cb34-41"><a href="#cb34-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd26</span> <span class="op">∀</span> i <span class="op">·</span> i <span class="op">∈</span> <span class="cn">ℕ</span></span>
+<span id="cb34-42"><a href="#cb34-42" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> (<span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> depth(i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb34-43"><a href="#cb34-43" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> (<span class="op">∃</span> p <span class="op">·</span> p <span class="op">∈</span> depth(i) <span class="op">∧</span> p <span class="op">=</span> Parent(c)))</span>
+<span id="cb34-44"><a href="#cb34-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">theorem</span> <span class="at">@grd27</span></span>
+<span id="cb34-45"><a href="#cb34-45" aria-hidden="true" tabindex="-1"></a>      <span class="op">∀</span> i <span class="op">·</span> i <span class="op">∈</span> <span class="cn">ℕ</span> <span class="op">∧</span> (<span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> depth(i)</span>
+<span id="cb34-46"><a href="#cb34-46" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> (<span class="op">∃</span> E <span class="op">·</span> E <span class="op">⊆</span> Containers <span class="op">∧</span> Root <span class="op">∉</span> E <span class="op">∧</span> Parent[E] <span class="op">∪</span> {c} <span class="op">=</span> E <span class="op">∪</span> {Root}))</span>
+<span id="cb34-47"><a href="#cb34-47" aria-hidden="true" tabindex="-1"></a>          <span class="op">⇒</span> (<span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> depth(i <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb34-48"><a href="#cb34-48" aria-hidden="true" tabindex="-1"></a>            <span class="op">⇒</span> (<span class="op">∃</span> E <span class="op">·</span> E <span class="op">⊆</span> Containers <span class="op">∧</span> Root <span class="op">∉</span> E <span class="op">∧</span> Parent[E] <span class="op">∪</span> {c} <span class="op">=</span> E <span class="op">∪</span> {Root}))</span>
+<span id="cb34-49"><a href="#cb34-49" aria-hidden="true" tabindex="-1"></a>    <span class="kw">theorem</span> <span class="at">@grd28</span></span>
+<span id="cb34-50"><a href="#cb34-50" aria-hidden="true" tabindex="-1"></a>      <span class="op">∀</span> i <span class="op">·</span> i <span class="op">∈</span> <span class="cn">ℕ</span> <span class="op">⇒</span> (<span class="op">∀</span> c <span class="op">·</span> c <span class="op">∈</span> depth(i)</span>
+<span id="cb34-51"><a href="#cb34-51" aria-hidden="true" tabindex="-1"></a>        <span class="op">⇒</span> (<span class="op">∃</span> E <span class="op">·</span> E <span class="op">⊆</span> Containers <span class="op">∧</span> Root <span class="op">∉</span> E <span class="op">∧</span> Parent[E] <span class="op">∪</span> {c} <span class="op">=</span> E <span class="op">∪</span> {Root}))</span>
+<span id="cb34-52"><a href="#cb34-52" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span></span>
+<span id="cb34-53"><a href="#cb34-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act1</span> CurrUnion <span class="op">:=</span> CurrUnion <span class="op">∪</span> {object}</span>
+<span id="cb34-54"><a href="#cb34-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act2</span> Entities <span class="op">:=</span> Entities <span class="op">∪</span> {object}</span>
+<span id="cb34-55"><a href="#cb34-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act3</span> Objects <span class="op">:=</span> Objects <span class="op">∪</span> {object}</span>
+<span id="cb34-56"><a href="#cb34-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act4</span> EntityNames(object) <span class="op">:=</span> {parent <span class="op">↦</span> name}</span>
+<span id="cb34-57"><a href="#cb34-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act5</span> RoleRights <span class="op">:=</span> roleRights</span>
+<span id="cb34-58"><a href="#cb34-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act6</span> Direct(object) <span class="op">:=</span> dLabel</span>
+<span id="cb34-59"><a href="#cb34-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act7</span> EntityMP(object) <span class="op">:=</span> mountPoint</span>
+<span id="cb34-60"><a href="#cb34-60" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="использование-математической-индукции" class="level3">
+<h3 class="anchored" data-anchor-id="использование-математической-индукции">4.4.5. Использование математической индукции</h3>
+<p>При доказательстве сохранности инвариантов иногда требуется использовать пятую аксиому Пеано натуральных чисел, а именно аксиому индукции: если какое-либо предложение доказано для 0 (база индукции) и если из допущения, что оно верно для натурального числа п, вытекает, что оно верно для следующего за п натурального числа (индукционное предположение), то это предложение верно для всех натуральных чисел. Рассмотрим использование доказательства по индукции в Event-B на примере события create_object.</p>
+<p>Для доказательства сохранности одного из инвариантов для события <span class="math inline">create\_object</span> потребовалось использовать следующее свойство: для каждой сущности-контейнера существует путь до корневого каталога. На Event-B данное свойство можно выразить так: для каждой сущности-контейнера c существует множество сущностей-контейнеров E (которое и задает требуемый путь), не включающее в себя корневой каталог, такое, что множество непосредственных родителей в иерархии сущностей для всех сущностей-контейнеров из множества E в объединении с сущностью-контейнером c равно объединению множества E и корневого каталога Root:</p>
+<p><span class="math display">\forall c \cdot c \in Containers \Rightarrow (\exists E \cdot E \subseteq Containers \land Root \notin E \land Parent[E] \cup \{c\} = E \cup \{Root\})</span></p>
+<p>Рассмотрим данное свойство с помощью рис. 4.3 на примере пути от сущности-контейнера c до корневого каталога. Тогда множество E, которое будет соответствовать данному пути, будет состоять из элементов <span class="math inline">\{x,p,c\}</span> . Множество непосредственных родителей в иерархии сущностей для всех сущностей-контейнеров из множества E, выражаемое в виде <span class="math inline">\mathit{Parent}(E)</span> , можно вычислить следующим образом:</p>
+<p><img src="../images/fig4.3.svg" class="img-fluid"></p>
+<p>Рис. 4.3. Путь до корневого каталога от сущности-контейнера с</p>
+<p><img src="../images/fig4.4.svg" class="img-fluid"></p>
+<p>Рис. 4.4. Глубина сущностей-контейнеров в иерархии сущностей</p>
+<p><span class="math display">Parent[E] = Parent(x) \cup Parent(p) \cup Parent(c) = \{Root\} \cup \{x\} \cup \{p\}</span></p>
+<p>Выбранное нами множество E действительно удовлетворяет свойству</p>
+<p><span class="math display">Parent[E] \cup \{c\} = \{x, p, c\} \cup \{Root\},</span></p>
+<p>так как</p>
+<p><span class="math display">\{Root,x,p\} \cup \{c\} = \{x,p,c\} \cup \{Root\}.</span></p>
+<p>Однако если бы мы выбрали для сущности-контейнера c другое множество E, например включающее в себя сущность-контейнер y, то данное свойство уже бы не выполнялось, что означало бы, что данное множество не является отображением пути до корневого каталога.</p>
+<p>Чтобы использовать данное свойство, его нужно сначала доказать. Для этого можно использовать математическую индукцию: поставим в соответствие для каждой сущности-контейнера ее глубину (наибольшую длину пути от корневого каталога до данной сущности-контейнера) (рис. 4.4). Тогда базе индукции будет соответствовать сам корневой каталог, а свойство существования пути до корневого каталога будет доказано следующим образом: пусть c=Root, тогда нужно найти такое E, что</p>
+<p><span class="math display">\exists E \cdot E \subseteq Containers \land Root \notin E \land Parent[E] \cup \{Root\} = E \cup \{Root\}</span></p>
+<p>Таким E является <span class="math inline">\varnothing</span> . Проверим это:</p>
+<p><span class="math display">\varnothing \subseteq Containers \land Root \notin \varnothing \land Parent[\varnothing] \cup \{Root\} = \varnothing \cup \{Root\}</span></p>
+<p>Первые два конъюнкта очевидно истинны. Так как <span class="math inline">Parent[\varnothing] = \varnothing</span> , то третий конъюнкт на самом деле является тождеством. База индукции доказана.</p>
+<p>Далее следует доказать индукционное предположение: при условии существовании пути до корневого каталога от любой сущности-контейнера, расположенной на глубине i, доказать, что существует путь до корневого каталога любой сущности-контейнера, расположенной на глубине i+1. Это достаточно просто: выберем случайную сущность-контейнер, расположенную на глубине i+1, и назовем ее c.&nbsp;По определению используемой нами функции глубины, у каждой сущности на глубине i+1 существует родительская сущность контейнер, расположенная на глубине i, — назовем ее p.&nbsp;Из первой части индукционного предположения известно, что для любой сущности-контейнера на глубине i существует путь до корневого каталога, назовем этот путь E. Тогда требуемый для доказательства путь до корневого каталога от сущности-контейнера для глубине i+1 будет <span class="math inline">E \cup \{p\}</span> .</p>
+<p>Теперь перенесем данные рассуждения на событие create_object на Event-B. Объявим функцию глубины как дополнительный параметр события depth. В охранном условии <span class="citation" data-cites="grd22">@grd22</span> зададим тип данного параметра: функция, ставящая для каждого натурального числа (собственно глубины) множество сущностей-контейнеров, которые находятся на данной глубине. Последующие охранные условия описывают функцию глубины более полным образом:</p>
+<ul>
+<li>атрибут глубины должен быть у каждой сущности-контейнера (<span class="citation" data-cites="grd23">@grd23</span>);</li>
+<li>на нулевой глубине должен находиться только корневой каталог (<span class="citation" data-cites="grd24">@grd24</span>);</li>
+<li>корневой каталог не может находиться на глубине отличной от 0 (<span class="citation" data-cites="grd25">@grd25</span>);</li>
+<li>для любой сущности-контейнера на глубине i+1 существует сущность-контейнер на глубине i, которая является его родителем (<span class="citation" data-cites="grd26">@grd26</span>).</li>
+</ul>
+<p>Используя функцию глубины, можно задать индукционное предположение в виде теоремы <span class="citation" data-cites="grd27">@grd27</span>: если существует путь до корневого каталога от любой сущности-контейнера на глубине i, то существует и для любой сущности-контейнера на глубине i+1. Данную теорему нужно доказать (мы это уже сделали неформальным образом выше), а затем совместно с базой индукции <span class="citation" data-cites="grd24">@grd24</span> использовать для доказательства исходного свойства существования пути до корневого каталога для любой сущности-контейнера, которое мы выразили в виде теоремы <span class="citation" data-cites="grd28">@grd28</span>. Аналогичным образом выполняется доказательство по индукции еще для нескольких событий в спецификации МРОСЛ ДП-модели.</p>
+</section>
+<section id="разделение-правила-перехода-системы-из-состояния-в-состояние-на-несколько-событий" class="level3">
+<h3 class="anchored" data-anchor-id="разделение-правила-перехода-системы-из-состояния-в-состояние-на-несколько-событий">4.4.6. Разделение правила перехода системы из состояния в состояние на несколько событий</h3>
+<p>Следующее, о чем целесообразно упомянуть в контексте различий между МРОСЛ ДП-моделью и ее спецификацией на Event-B, это разделение некоторых правил перехода системы из состояния в состояние на два и более события. Данное действие требуется обычно в случаях, когда правило описывает логически общее действие — например, получение доступа на чтение — но направленное на разные объекты — например, доступ на чтение к сущности или роли. Рассмотрим правило перехода системы из состояния в состояние access_read (табл. 4.3).</p>
+<p>Таблица 4.3. Правило перехода системы из состояния в состояние <em>access_read</em></p>
+<div class="dejure-table">
+<div class="dejure-head">
+<div class="dejure-h-pre">
+<p>Исходное состояние <span class="math inline">G</span></p>
+</div>
+<div class="dejure-h-post">
+<p>Результирующее состояние <span class="math inline">G'</span></p>
+</div>
+</div>
+<div class="dejure-rule">
+<div class="dejure-name">
+<p><strong>access_read(x, y)</strong></p>
+</div>
+<div class="dejure-grid">
+<div class="dejure-pre">
+<p><em>Исходное состояние <span class="math inline">G</span>:</em></p>
+<ol type="1">
+<li><span class="math inline">x \in S</span>;</li>
+<li><span class="math inline">y \in E \cup R \cup AR</span>;</li>
+<li>существует <span class="math inline">r \in R \cup AR</span>: <span class="math inline">(x, r, read_{a}) \in AA</span>, [если <span class="math inline">y \in E</span>, то <span class="math inline">(y, read_{r}) \in PA(r)</span> и существует контейнер <span class="math inline">c \in C</span> такой, что <span class="math inline">execute\_container(x, c, y) = true</span>]; [если <span class="math inline">y \in R \cup AR</span>, то <span class="math inline">(y, read_{r}) \in APA(r)</span>].</li>
+</ol>
+</div>
+<div class="dejure-post">
+<p><em>Результирующее состояние <span class="math inline">G'</span>:</em></p>
+<ol type="1">
+<li>если <span class="math inline">y \in E</span>, то <span class="math inline">A' = A \cup \{(x, y, read_{a})\}</span>, <span class="math inline">AA' = AA</span>;</li>
+<li>если <span class="math inline">y \in R \cup AR</span>, то <span class="math inline">AA' = AA \cup \{(x, y, read_{a})\}</span>, <span class="math inline">A' = A</span>.</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<p>Параметр y может быть как сущностью, так и ролью, и в зависимости от этого различаются пред- и постусловия правила. В принципе, это не препятствует прямому их переносу на Event-B, однако итоговое событие получится неоправданно усложненным. Вместо этого предлагается в данном случае разбить одно событие на два независимых, каждое из которых будет описывать отдельный частный случай — получение доступа к сущности (событие <span class="math inline">access\_read\_entity</span> ) и получение доступа к роли (событие <span class="math inline">access\_read\_entity</span> ):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">event</span> access_read_entity</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">any</span> subject entity</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd1</span> subject <span class="op">∈</span> Subjects</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd2</span> entity <span class="op">∈</span> Entities</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd3</span> <span class="op">∃</span> r <span class="op">·</span> r <span class="op">∈</span> Roles <span class="op">∧</span> r <span class="op">↦</span> ReadA <span class="op">∈</span> SubjectAdmAccesses(subject)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> entity <span class="op">↦</span> Read <span class="op">∈</span> RoleRights(r)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd4</span> <span class="op">∃</span> E, c <span class="op">·</span> E <span class="op">⊆</span> Containers <span class="op">∧</span> Root <span class="op">∉</span> E</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> ((entity <span class="op">∈</span> <span class="op">dom</span>(EntityNames) <span class="op">∧</span> c <span class="op">∈</span> <span class="op">dom</span>(EntityNames(entity))</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> Parent[E] <span class="op">∪</span> {c} <span class="op">=</span> E <span class="op">∪</span> {Root}) <span class="op">∨</span> (E <span class="op">=</span> <span class="cn">∅</span> <span class="op">∧</span> entity <span class="op">=</span> Root))</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">∧</span> (<span class="op">∀</span> o <span class="op">·</span> o <span class="op">∈</span> E <span class="op">∪</span> {entity} <span class="op">∪</span> {Root} <span class="op">⇒</span> (<span class="op">∃</span> r <span class="op">·</span> r <span class="op">∈</span> Roles</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>          <span class="op">∧</span> r <span class="op">↦</span> ReadA <span class="op">∈</span> SubjectAdmAccesses(subject)</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>          <span class="op">∧</span> o <span class="op">↦</span> Execute <span class="op">∈</span> RoleRights(r)))</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act1</span> SubjectAccesses(subject) <span class="op">:=</span> SubjectAccesses(subject)</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>      <span class="op">∪</span> {entity <span class="op">↦</span> ReadA}</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a><span class="kw">event</span> access_read_role</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>  <span class="kw">any</span> subject role</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd1</span> subject <span class="op">∈</span> Subjects</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd2</span> role <span class="op">∈</span> Roles</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">@grd3</span> <span class="op">∃</span> r <span class="op">·</span> r <span class="op">∈</span> AdmRoles <span class="op">∧</span> role <span class="op">↦</span> ReadA <span class="op">∈</span> RoleAdmRights(r)</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> r <span class="op">↦</span> Read <span class="op">∈</span> SubjectAdmAccesses(subject)</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>  <span class="kw">then</span></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">@act1</span> SubjectAdmAccesses(subject) <span class="op">:=</span> SubjectAdmAccesses</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>      (subject) <span class="op">∪</span> {role <span class="op">↦</span> ReadA}</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="отсутствующие-в-спецификации-элементы-мросл-дп-модели" class="level3">
+<h3 class="anchored" data-anchor-id="отсутствующие-в-спецификации-элементы-мросл-дп-модели">4.4.7. Отсутствующие в спецификации элементы МРОСЛ ДП-модели</h3>
+<p>В тексте МРОСЛ ДП-модели приводится определение функции значений сущностей, ролей и административных ролей V, задающей возможность для каждой из них принимать значение любой конечной последовательности бит. Значение данной функции изменяется исключительно в следующих правилах перехода системы из состояния в состояние: get_user_attr, read_container, get_entity_attr, get_subject_attr, get_role_attr. Приведенные правила не изменяют значений никаких других функций и множеств, определенных в модели, и в модели не содержится никаких условий и требований, которым должна удовлетворять функция V. Как следствие, данная функция и связанные с ней правила перехода системы из состояния в состояние не были реализованы в Event-B спецификации, так как на данный момент они малополезны с точки зрения верификации спецификации.</p>
+</section>
+<section id="формализация-свойств-безопасности-мросл-дп-модели" class="level3">
+<h3 class="anchored" data-anchor-id="формализация-свойств-безопасности-мросл-дп-модели">4.4.8. Формализация свойств безопасности МРОСЛ ДП-модели</h3>
+<p>В представленной выше спецификации отсутствуют инварианты, соответствующие содержательным свойствам безопасности. Например, основное правило управления доступом, использующего роли, могло бы быть представлено так: если субъект-сессия имеет доступ на чтение или запись к какой-либо сущности, значит она владеет ролью (имеет к ней доступ на чтение), дающей право на выполнение такого же вида действий (соответственно, чтения или записи) над этой сущностью. В виде инварианта такое правило для доступа на чтение могло бы выглядеть следующим образом.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@AccessesAreOnlyThroughRoles</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>e, s <span class="op">·</span> e <span class="op">∈</span> Entities <span class="op">∧</span> s <span class="op">∈</span> Subjects <span class="op">∧</span> e <span class="op">↦</span> ReadA <span class="op">∈</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>      SubjectAccesses(s)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>      <span class="op">⇒</span> (<span class="op">∃</span>r <span class="op">·</span> r <span class="op">∈</span> Roles <span class="op">∧</span> r <span class="op">↦</span> ReadA <span class="op">∈</span> SubjectAdmAccesses(s)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">∧</span> e <span class="op">↦</span> Read <span class="op">∈</span> RoleRights(r))</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Однако можно заметить, что такой инвариант не может быть выполнен в представленной спецификации, поскольку в ней есть события, изменяющие как права доступа ролей, так и доступы сессий к ролям. Сессия, получившая доступ к какой-либо сущности благодаря владению ролью, имеющей на это право, может сохранять этот доступ даже тогда, когда эта роль будет модифицирована и потеряет соответствующее право, или сессия потеряет доступ к этой роли. Таким образом, в описанной спецификации ограничения, связанные с предоставлением доступа только в соответствии с правами ролей, гарантированно выполняются лишь в сам момент получения доступа — в охранных условиях событий получения доступа эти правила проверяются, и доступ предоставляется согласно имеющимся у сессии ролям, однако последующие изменения прав ролей не отслеживаются и не влияют на уже полученные доступы.</p>
+<p>Проверка ограничений доступа лишь в момент его получения может быть недостаточна при описании более строгих ограничений, например ограничений мандатного управления доступом. В спецификациях, формализующих такие ограничения, крайне желательно иметь соответствующие им инварианты, обеспечивающие выполнение ограничений во всех достижимых состояниях. При этом трудности, связанные с возможными изменениями уровней доступа (аналогичные продемонстрированным выше в связи с изменениями прав ролей), могут быть разрешены за счет ограничений на такие изменения в охранных условиях событий или разделением режимов работы системы на обычный (в рамках которого никаких изменений уровней доступа не происходит) и административный (в котором их разрешено менять, соответственно, инварианты безопасности могут нарушаться при таких изменениях, однако должны быть выполнены при переходе в обычный режим).</p>
+</section>
+</section>
+<section id="верификация" class="level2">
+<h2 class="anchored" data-anchor-id="верификация">4.5. Верификация</h2>
+<p>Комплекс инструментальных средств AstraVer Toolset <a href="../chapters/bibliography.html#ref-45">[45]</a> включает в себя среду для разработки и верификации спецификаций на Event-B, основанную на платформе Rodin <a href="../chapters/bibliography.html#ref-44">[44]</a>. Спецификации на Event-B разрабатываются и верифицируются с помощью платформы Rodin. Для каждого требующего доказательства свойства спецификации Rodin автоматически генерирует соответствующие утверждения для доказательства, причем платформа решает проблему поддержки актуальности сгенерированных утверждений и выполненных доказательств в случае изменений в спецификации. Полное доказательство спецификации означает, что доказаны все сгенерированные утверждения.</p>
+<p>Для спецификации базового уровня МРОСЛ ДП-модели было сгенерировано 831 утверждение для доказательства, часть из которых была доказана полностью автоматически, а оставшаяся часть — интерактивным образом, при котором доказательство сначала упрощалось и разбивалось на составные части вручную, а уже затем подавалось на вход инструментам автоматического доказательства теорем.</p>
+<p>Рассмотрим следующее условие МРОСЛ ДП-модели: для каждой роли существует единственная административная роль <span class="math inline">roles\_admin\_role</span> , обладающая к ней правом доступа владения, для каждой административной роли существует единственная административная роль <span class="math inline">admin\_roles\_admin\_role</span> , обладающая к ней правом доступа владения. Данное условие выполняется в результате выполнения каждого правила перехода системы из состояния в состояние, так как право доступа владения к ролям или административным ролям дается только административным ролям <span class="math inline">roles\_admin\_role</span> или <span class="math inline">admin\_roles\_admin\_role</span> в результате применения правила вида <span class="math inline">create\_user(x,x',u)</span> и <span class="math inline">create\_role(x,r,name,rz)</span> , и нет правил, позволяющих изменить такую роль-владельца роли или административной роли.</p>
+<p>Так выглядит математическое доказательство. Рассмотрим теперь тоже самое условие, однако выраженное в виде инвариантов на Event-B:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode eventb code-with-copy"><code class="sourceCode eventb"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">invariants</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">@RolesAR1</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>r <span class="op">·</span> r <span class="op">∈</span> OrdRoles <span class="op">⇒</span> r <span class="op">↦</span> Own <span class="op">∈</span> RoleAdmRights(RolesAR)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">@ARolesAR1</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">∀</span>r <span class="op">·</span> r <span class="op">∈</span> AdmRoles <span class="op">⇒</span> r <span class="op">↦</span> Own <span class="op">∈</span> RoleAdmRights(ARolesAR)</span></code></pre></div><button title="Скопировать текст" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Для каждого изменения входящих в эти инварианты переменных в результате выполнения какого-либо события, а именно переменных OrdRoles, AdmRoles, RoleAdmRights, система верификации сгенерирует утверждения для доказательства. В данном случае утверждения будут сгенерированы для событий create_user, delete_user, create_role, create_hard_link_role, delete_role, grant_admin_rights, remove_admin_rights, так как это полный список событий, в которых каким-либо образом изменяются интересующие нас переменные. Рассмотрим данные события:</p>
+<ul>
+<li>в событиях create_user и create_role происходит создание новых ролей (изменение множеств AdmRoles и OrdRoles), а также изменение функции доступов RoleAdmRights. Инварианты сохраняются, так как в условиях событий явно прописано добавление доступа владения к создаваемым ролям ARolesAR и RolesAR;</li>
+<li>в событиях delete_user и delete_role удаляются индивидуальные роли пользователя, а также происходит удаление связанных с ними доступов в функции RoleAdmRights. Это может нарушить инварианты в случае, когда удаляемой ролью становится роль ARolesAR или RolesAR. Однако эта ситуация исключена в предусловиях данных событий и инвариантах;</li>
+<li>в событиях create_hard_link_role, grant_admin_rights, remove_admin_rights изменяется функция доступов RoleAdmRights, однако в ходе доказательства можно показать, что данные изменения никак не затрагивают права доступа владения.</li>
+</ul>
+<p>Следует напомнить, что доказательство на Event-B на самом деле проводится с использованием автоматических и интерактивных инструментов, которые следят за его корректностью и не позволяют допускать ошибки, а данный пример является его примерным словесным описанием.</p>
+<p>В итоге получается, что доказательство на Event-B в целом соответствует математическому доказательству (выполняемому «вручную» аналитиком), однако является более достоверным, что иногда позволяет находить несоответствия и нестыковки в описании специфицируемой системы.</p>
+</section>
+<section id="использование-уточнения" class="level2">
+<h2 class="anchored" data-anchor-id="использование-уточнения">4.6. Использование уточнения</h2>
+<p>В настоящее время МРОСЛ ДП-модель имеет иерархическое представление, состоящее из серии уровней. Нижний уровень модели — базовый уровень, который используется в качестве примера в данной работе, — не зависит от новых элементов, принадлежащих более высоким уровням модели. В свою очередь, все остальные уровни модели наследуют элементы предыдущих уровней, при необходимости корректируя, а также дополняя их новыми элементами.</p>
+<p>Event-B позволяет разрабатывать спецификации, отражающие подобную иерархическую структуру. Для этого предлагается использовать технику пошагового уточнения <a href="../chapters/bibliography.html#ref-46">[46, 47]</a>. Вместо создания единой монолитной спецификации, которая будет содержать в себе все детали моделируемой системы, уточнение предлагает разрабатывать серию связанных между собой спецификаций. В такой серии первая спецификация представляет собой некоторую базовую версию системы, которая содержит в себе только основные детали. Дополнительные детали системы шаг за шагом добавляются в остальных спецификациях серии таким образом, что каждая последующая спецификация в серии является уточнением предыдущих. Подробней с техникой уточнения можно ознакомиться в Приложениях А и В.</p>
+<p>Как правило, на каждом уровне уточнения добавляются новые переменные, новые события, которые изменяют значения новых переменных, а также модифицируются старые события, например вводятся дополнительные охранные условия, учитывающие значения новых переменных. При этом уточнение позволяет использовать определенные ранее (на предыдущих уровнях уточнения) переменные, но не позволяет изменять их значения. Запрет на изменение старых переменных позволяет быть уверенным, что определенные и доказанные на прошлых уровнях инварианты будут выполняться и на всех последующих. Кроме этого, новые детали системы не должны противоречить старым.</p>
+<p>Данные свойства уточнения входят в некоторое противоречие с иерархической структурой МРОСЛ ДП-модели, которая позволяет более высоким уровням при необходимости корректировать элементы предыдущих уровней. Так, например, на базовом уровне в правиле перехода системы из состояния в состояние create_user создаются ровно две индивидуальные роли пользователя. На уровне, в котором реализуется мандатное управление доступом, число создаваемых индивидуальных ролей будет другим: оно будет зависеть от мандатной метки конфиденциальности создаваемой учетной записи пользователя. На Event-B же, если на базовом уровне спецификации сказано, что в событии создается только две роли, то и на всех последующих уровнях в данном событии будут создаваться ровно две роли.</p>
+<p>Такое явное противоречие (с точки зрения уточнения и Event-B) просто не позволяет использовать уточнение для добавления новых уровней к приведенной в данной главе Event-B спецификации базового уровня МРОСЛ ДП-модели. Для того чтобы это было возможно, подобные противоречия следует предварительно устранить. В приведенном выше примере для устранения противоречия между двумя уровнями в событии create_user спецификации базового уровня следует отметить, что создаваемых ролей будет несколько, но отдельно описать свойства только двух из них. При уточнении свойства остальных создаваемых индивидуальных ролей будут добавлены в спецификацию в виде дополнительных охранных условий соответствующих событий на уровне мандатного управления доступом.</p>
+<p>Рассмотренный метод удовлетворяет требованиям компонента доверия ADV_SPM.1 «Формальная модель политики безопасности» наличия формальной модели политики безопасности (спецификация на формализованном языке Event-B) и ее верификации (формальное доказательство невозможности перехода спецификации в небезопасное состояние). В следующей главе будет предложен подход к формальному доказательству соответствия между функциональной спецификацией объекта оценки и формальной моделью политики безопасности.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<!-- Normalize Graphviz (dot) figures so the book's diagram CSS can size them.
+     Quarto stamps dot <svg> with a fixed width/height (default 7x5in) and an inline
+     style="max-width:none", which forces the wrong aspect ratio (vertical whitespace)
+     and defeats the responsive max-width in theme.scss. Removing the forced width/height
+     lets the intrinsic viewBox drive the aspect; clearing the inline max-* lets the
+     stylesheet cap the width. Mermaid manages its own sizing, so we touch dot only. -->
+<script>
+(function () {
+  function fit() {
+    document.querySelectorAll('main.content div.cell svg').forEach(function (svg) {
+      if (!svg.querySelector(':scope > g.graph')) return;   // graphviz output only
+      svg.removeAttribute('width');
+      svg.removeAttribute('height');
+      svg.style.maxWidth = '';
+      svg.style.maxHeight = '';
+    });
+  }
+  if (document.readyState !== 'loading') fit();
+  else document.addEventListener('DOMContentLoaded', fit);
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Скопировано");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Скопировано");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/eventb-rossi\.github\.io\/security_monograph\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/03-model.html" class="pagination-link" aria-label="Глава 3. Модель политики безопасности управления доступом — требования к составу и структуре модели. Базовый уровень МРОСЛ ДП-модели">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Глава 3. Модель политики безопасности управления доступом — требования к составу и структуре модели. Базовый уровень МРОСЛ ДП-модели</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/05-functional-spec.html" class="pagination-link" aria-label="Глава 5. Формальная функциональная спецификация">
+        <span class="nav-page-text"><span class="chapter-title">Глава 5. Формальная функциональная спецификация</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

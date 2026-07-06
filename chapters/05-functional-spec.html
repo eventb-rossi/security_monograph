@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Глава 5. Формальная функциональная спецификация – Моделирование и верификация политик безопасности управления доступом в операционных системах</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chapters/06-deductive-verification.html" rel="next">
+<link href="../chapters/04-event-b.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-375f9023c1da6849cf4f3d7f8accab6b.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-3d3bc5d9f0e246eedfcea4a82b2f9c37.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-375f9023c1da6849cf4f3d7f8accab6b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ca1fdf2217a789155a14a984c486a011.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Поиск не дал результатов",
+    "search-matching-documents-text": "Результаты поиска",
+    "search-copy-link-title": "Скопировать ссылку",
+    "search-hide-matches-text": "Скрыть дополнительные результаты",
+    "search-more-match-text": "дополнительный результат в этом документе",
+    "search-more-matches-text": "дополнительных результата(-ов) в этом документе",
+    "search-clear-button-title": "Очистить",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Отменить",
+    "search-submit-button-title": "Найти",
+    "search-label": "Поиск"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Переключить боковую панель навигации" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/05-functional-spec.html"><span class="chapter-title">Глава 5. Формальная функциональная спецификация</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Переключить боковую панель навигации" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Поиск" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Моделирование и верификация политик безопасности управления доступом в операционных системах</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Переключить темный режим"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Поиск"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Моделирование и верификация политик безопасности управления доступом в операционных системах</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/00-preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Предисловие</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/01-formal-methods.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 1. Формальные методы в разработке и сертификации средств защиты информации</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/02-process.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 2. Описание процесса моделирования и верификации механизма управления доступом операционной системы</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/03-model.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 3. Модель политики безопасности управления доступом — требования к составу и структуре модели. Базовый уровень МРОСЛ ДП-модели</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/04-event-b.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/05-functional-spec.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Глава 5. Формальная функциональная спецификация</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06-deductive-verification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 6. Дедуктивная верификация модуля безопасности ядра ОС Linux</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/07-dynamic-monitoring.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Глава 7. Динамический мониторинг</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/conclusion.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Заключение</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/abbreviations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Используемые сокращения и обозначения</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/bibliography.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Литература</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/appendix-a.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Приложение А. Язык спецификаций Event-B</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/appendix-b.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Приложение В. Среда разработки и верификации на языке Event-B</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/colophon.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Научное издание</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Содержание</h2>
+   
+  <ul>
+  <li><a href="#построение-соответствия-между-системными-вызовами-и-правилами-мросл-дп-модели" id="toc-построение-соответствия-между-системными-вызовами-и-правилами-мросл-дп-модели" class="nav-link active" data-scroll-target="#построение-соответствия-между-системными-вызовами-и-правилами-мросл-дп-модели">5.1. Построение соответствия между системными вызовами и правилами МРОСЛ ДП-модели</a></li>
+  <li><a href="#пример-формализации-функциональной-спецификации" id="toc-пример-формализации-функциональной-спецификации" class="nav-link" data-scroll-target="#пример-формализации-функциональной-спецификации">5.2. Пример формализации функциональной спецификации</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-title">Глава 5. Формальная функциональная спецификация</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>В данной главе рассматривается второй этап процесса моделирования и верификации механизма управления доступом операционной системы, а именно разработка и верификация формальной функциональной спецификации ОО. Требования к этой работе сформулированы в компонентах доверия ADV_FSP.6 «Полная полуформальная функциональная спецификация с дополнительной формальной спецификацией» и ADV_SPM.1 «Формальная модель политики безопасности ОО»:</p>
+<ul>
+<li>ADV_FSP.6.9C. В формальном представлении функциональной спецификации ФБО должно быть изложено формальное описание интерфейса ФБО, дополненное, где это необходимо, неформальным пояснительным текстом;</li>
+<li>ADV_SPM.1.3C. Соответствие между моделью политики безопасности и функциональной спецификацией должно быть представлено на соответствующем уровне формализации;</li>
+<li>ADV_SPM.1.4C. В соответствии между моделью политики безопасности объекта оценки (ПБО) и функциональной спецификацией должно быть продемонстрировано, что функциональная спецификация является непротиворечивой и полной относительно модели ПБО.</li>
+</ul>
+<p>В данных требованиях под интерфейсом функций безопасности понимается совокупность всех способов, через которые пользователи могут получить доступ к защищенным ресурсам системы. В случае ядра ОС интерфейсом, доступным приложениям, а через них и пользователям ОС, являются системные вызовы. Напрямую пользователь не взаимодействует со средствами защиты информации, так как они функционируют внутри ядра ОС. Пользователь может обнаружить эффект их действия только в ходе выполнения некоторых системных вызовов, которые исходят от исполняемого приложения пользователя. Например, если приложение пользователя попытается открыть на запись файл, к которому в соответствии с заданной политикой безопасности ему разрешен доступ только на чтение, оно получит код ответа, сообщающий, что при попытке открытия файла произошла ошибка, и файл открыть не удалось.</p>
+<p>То есть пользователь может наблюдать поведение системы защиты информации, но его взаимодействие с системой защиты происходит опосредованно.</p>
+<p>Мы можем заключить, что в нашем случае интерфейсом ОО является интерфейс системных вызовов и именно для этого интерфейса должна быть представлена формальная функциональная спецификация, которую затем необходимо исследовать на предмет того, является ли она полной и непротиворечивой по отношению к модели политики безопасности управления доступом.</p>
+<p>Начнем с задачи разработки формальной функциональной спецификации системных вызовов. В идеальном случае можно было бы ожидать, что разработчики ОС сами предоставляют полную и строгую спецификацию интерфейса разрабатываемого программного продукта. Заметим, что здесь речь идет не только о строгом описании структуры (синтаксиса) интерфейсных сущностей, но и об их функциональности, т. е. об описании наблюдаемого извне поведения ОС в ходе взаимодействия с ней приложений посредством этих интерфейсных сущностей.</p>
+<p>К сожалению, в практике промышленного программирования разработка строгих или формальных спецификаций выполняется крайне редко (хотя заметим, что разработчики микропроцессоров всегда создают как минимум строгие спецификации системы команд процессора). В случае ОС принципиальных технических трудностей для разработки спецификации системных вызовов нет. Полная формальная спецификация программного интерфейса ОС реального времени была разработана в 1994-1997 годах <a href="../chapters/bibliography.html#ref-48">[48]</a>, в 2005-2010 годах были разработаны спецификации для ОС Windows <a href="../chapters/bibliography.html#ref-49">[49]</a> и для базового набора системных библиотек ОС Linux <a href="../chapters/bibliography.html#ref-50">[50]</a>. Все три проекта использовали близкие по идеологии техники спецификации, которые сводились к разработке программных контрактов в форме пред- и постусловий и/или описания ожидаемого поведения функций в форме некоторой исполнимой модели (в роли модели могла быть программа на языке спецификации или на некотором диалекте C или C#). Природа моделей, которые использовались в этих проектах, относится к классу так называемых моделей на основе состояний (state-based models). Такие модели состоят из набора операций (функций, событий), входом к которым служат некоторые данные (аргументы, фактические параметры), а выходом некоторый результат операции (значение функции). Также операции имеют доступ к некоторым глобальным структурам данных (состоянию). Результат операции зависит от состояния, в котором она вызывается. Кроме того, изменение данных состояния может быть частью результата, в таком случае говорят, в результате выполнения операции система перешла из одного состояния в другое.</p>
+<p>По сути при разработке формальной спецификации МРОСЛ ДП-модели на Event-B мы использовали близкий подход. Таким же образом технически возможно с использованием уже известного нам инструментария разработать и формальную функциональную спецификацию системных вызовов ядра ОС Linux.</p>
+<p>Далее после задачи разработки формальной функциональной спецификации стоит задача демонстрации (а еще лучше, доказательства) соответствия между ней и спецификацией модели политики безопасности. Здесь и далее под свойством «соответствия» мы будем понимать выполнение требований к ОО, о которых говорилось выше, — требований полноты и непротиворечивости функциональной спецификации ОО по отношению к модели политики безопасности.</p>
+<p>Техникам доказательства соответствия между формальными спецификациями некоторой программной системы, которые отличаются друг от друга степенью детализации, посвящено достаточно много исследований. Техника пошагового уточнения <a href="../chapters/bibliography.html#ref-46">[46]</a> является одной из наиболее известных и широко используемых, в том или ином виде она поддерживается большинством формальных методов, включая Event-B. В рамках этого подхода рекомендуется вести разработку поэтапно, начиная с базового уровня спецификации, содержащей максимально простую и компактную модель системы, и затем постепенно добавлять новые детали в последующих уровнях, например, путем ввода новых операций или уточнения структур данных. В ходе каждого этапа проводится две группы доказательств корректности. Первая группа нацелена на доказательство корректности каждого уровня спецификации отдельно, самого по себе. Вторая группа доказательств должна подтвердить, что каждый новый уточненный уровень полон и не входит в противоречие с предыдущим, более абстрактным уровнем, то есть все свойства системы (и вся функциональность), описанные на более абстрактном уровне, сохранены и на более детальном уровне. Общая идеология данного подхода сводится к тому, что, если на каждом этапе разработки объем «приращения» функциональности небольшой и поддается формальной верификации, и, кроме того, доказано соответствие между уровнями спецификации, то можно гарантировать, что система в целом корректна и в ней выполнены все требования, которые были сформулированы по ходу проектирования.</p>
+<p>Таким образом, для доказательства соответствия между двумя спецификациями некоторой системы — между абстрактной спецификацией М1 и детальной спецификацией М2 (рис. 5.1) — достаточно показать, что между ними существует такое отношение уточнения R, что для каждого перехода между состояниями из спецификации М2, который ведет из некоторого состояния s в состояние s’, существует соответствующий переход в абстрактной спецификации М1 из абстрактного состояния <span class="math inline">\sigma</span> в состояние <span class="math inline">\sigma'</span> . При этом переход называется соответствующим, если выполняется соотношения <span class="math inline">R(s)=\sigma</span> и <span class="math inline">R(s')=\sigma'</span> .</p>
+<p><img src="../images/fig5.1.svg" class="img-fluid"></p>
+<p>Рис. 5.1. Диаграмма отношения уточнения между абстрактной и детальной спецификациями</p>
+<p>В общем случае доказывать требование соответствия для двух разных спецификаций одной системы достаточно трудно. По этой причине в методологиях и технологиях, которые развивали данный подход, вводились достаточно жесткие ограничения на то, как описываются новые уровни уточнения, т.е. правила детализации проектирования системы жестко ограничивались, чтобы предоставить возможность формальной проверки сохранения соответствия между более абстрактными и более детальными слоями проекта. Например, в методологии RAISE <a href="../chapters/bibliography.html#ref-51">[51]</a> нельзя было переопределять структуры данных, т. е. для каждого типа данных требовалось дать сразу полное и окончательное его описание, что для сложных и тем более развивающихся систем является очень неприятным ограничением. В Event-B нельзя изменять значения переменных, определенных ранее (на предыдущих уровнях уточнения). Хотя благодаря этому ограничению можно быть уверенным, что определенные и доказанные на прошлых уровнях инварианты будут выполняться и на всех последующих, оно существенно усложняет процесс планирования уровней уточнения при разработке спецификации.</p>
+<p>Возвращаясь к доказательству соответствия между моделью политики безопасности и формальной функциональной спецификацией, мы должны показать существование отношения уточнения R между их состояниями и операциями, причем на уровне формальной функциональной спецификации за переход между состояниями отвечают системные вызовы, а на уровне модели политики безопасности — де-юре правила МРОСЛ ДП-модели. Однако оказывается, что в нашем случае построение соответствия является весьма непростой задачей. Если набор структур данных и пространство состояний формальной функциональной спецификации и можно рассматривать как расширение структур данных и пространства состояния МРОСЛ ДП-модели, то операции формальной функциональной спецификации — системные вызовы — не удается прямо отобразить на правила МРОСЛ ДП-модели. Далее на примере показывается, как можно решить данную проблему и построить соответствие в нашем случае.</p>
+<section id="построение-соответствия-между-системными-вызовами-и-правилами-мросл-дп-модели" class="level2">
+<h2 class="anchored" data-anchor-id="построение-соответствия-между-системными-вызовами-и-правилами-мросл-дп-модели">5.1. Построение соответствия между системными вызовами и правилами МРОСЛ ДП-модели</h2>
+<p>Если подробно описать контекст, в котором вызывается тот или иной системный вызов, т. е. описать текущее состояние ОС и значение параметров вызова, то можно свести его выполнение к последовательности (цепочке) определенных действий и проверок. Часть из этих действий будет прямо соответствовать правилам перехода системы из состояния в состояние МРОСЛ ДП-модели, а для прочих можно показать, что они не влияют на выполнимость установленных в ней требований.</p>
+<p>Рассмотрим системный вызов open. Этот системный вызов реализуется функцией int open(const char *pathname, int flags), которая выполняет действия, необходимые для открытия файла. У функции open два параметра: строка pathname содержит путь до открываемого файла, а flags определяет вид доступа, который требуется получить — на чтение, на запись или на чтение и на запись одновременно. За это отвечают флаги O_RDONLY, O_WRONLY, O_RDWR. flags также может содержать дополнительные, необязательные флаги. Функция возвращает ассоциированный с файлом файловый дескриптор, который затем может использоваться в последующих системных вызовах (например, в read, write, lseek, fcntl).</p>
+<p>Рассмотрим частный случай вызова open, при котором файл из параметра pathname не существует, а параметр flags содержит флаг O_WRONLY, что означает открытие файла на запись, и дополнительный флаг O_CREAT, что позволит создать файл. Если процесс, от имени которого вызывается open, обладает всеми нужным правами доступа, то open должен выполнить следующую цепочку действий:</p>
+<ul>
+<li><p>разбор значений параметров;</p></li>
+<li><p>проверка наличия необходимых для создания файла прав доступа — в рассматриваемом частном случае проверка проходит успешно;</p></li>
+<li><p>получение доступа на запись к каталогу, в котором будет создан файл;</p></li>
+<li><p>создание файла;</p></li>
+<li><p>получение права доступа на запись к созданному файлу;</p></li>
+<li><p>получение доступов к созданному файлу;</p></li>
+<li><p>возвращение файлового дескриптора созданного и открытого на запись файла.</p></li>
+</ul>
+<p>Каждое из этих действий определенным образом изменяет состояние формальной функциональной спецификации (ФСП). Например, действие «возврат файлового дескриптора» изменяет множество всех открытых данным процессом файловых дескрипторов. Можно заметить, что три действия — а именно действия «получение доступа на запись», «получение права доступа на запись» и «создание файла» — прямо соответствуют правилам перехода между состояниями МРОСЛ ДП-модели access_write, grant_rights и create_object. Если рассматривать состояние ФСП как расширение состояния МРОСЛ ДП-модели, то данные действия изменяют исключительно ту ее часть, которая является общей с состоянием МРОСЛ ДП-модели. Для доказательства соответствия и непротиворечивости достаточно показать, что данные действия не нарушают определенных в МРОСЛ ДП-модели инвариантов через доказательство наличия отношения уточнения между действиями системного вызова open и правилами МРОСЛ ДП-модели. Остальные действия (назовем их вспомогательными) изменяют исключительно переменные из расширенного, дополненного состояния, т.е. те переменные, аналогов которых нет в состоянии МРОСЛ ДП-модели, так что они никак не влияют на существование отношения уточнения. Для демонстрации непротиворечивости таких действий относительно МРОСЛ ДП-модели следует сформулировать инварианты, которые свяжут значения переменных дополненного состояния формальной функциональной спецификации и переменных общего с МРОСЛ ДП-моделью состояния, и затем показать их выполнимость. Например, в данном случае следует сформулировать инвариант, который свяжет файловый дескриптор, открытый на запись (переменная дополненного состояния), с полученным доступом на запись (переменная общего с МРОСЛ ДП-моделью состояния).</p>
+<p>Конкретный путь выполнения, или конкретная последовательность действий, которая будет выполнена в результате вызова системного вызова open, зависит от контекста, в котором происходит вызов, а именно от текущего состояния ОС и значений параметров вызова. Если описать все возможные пути выполнения для каждого системного вызова, то доказательство того, что ФСП является непротиворечивой относительно МРОСЛ ДП-модели, может быть достигнуто за счет доказательства выполнимости инвариантов МРОСЛ ДП-модели и дополнительных связующих инвариантов при любом выполняемом внутри системного вызова действии. А для доказательства того, что ФСП является полной относительно МРОСЛ ДП-модели, необходимо показать, что каждое правило перехода системы из состояния в состояние МРОСЛ ДП-модели связано хотя бы с одним действием функциональной спецификации.</p>
+<p>Итак, мы показали, что в конкретном контексте системному вызову соответствует цепочка действий, которую можно отобразить на правила МРОСЛ ДП-модели. Подобные цепочки можно построить для каждого контекста и так для каждого системного вызова, тем самым решив проблему их отображения на правила МРОСЛ ДП-модели.</p>
+<p><img src="../images/fig5.2.svg" class="img-fluid"></p>
+<p>Рис. 5.2. Графовая модель небольшого подмножества цепочек действий системного вызова open</p>
+<p>Возникает вопрос, как перебрать все необходимые контексты и как это сделать без чрезмерных затрат труда. Можно заметить, что большинство цепочек, относящихся к одному системному вызову, похожи друг на друга и отличаются только в некоторых деталях. Так, если вместо примера открытия несуществующего файла на запись, рассмотренного выше, мы бы рассмотрели открытие несуществующего файла и на чтение, и на запись, то большинство действий в обоих событиях были бы общими. Или, если бы мы рассмотрели пример открытия уже существующего файла на запись (или на чтение и запись, или просто на чтение), то соответствующая данному контексту цепочка оказалась бы просто сокращенной версией цепочки из примера.</p>
+<p>Из-за подобного сходства цепочки, относящиеся к одному системному вызову, можно объединить друг с другом для получения графовой модели системного вызова. Пример подобной модели для нескольких контекстов вызова open, рассмотренных выше, приводится на рис. 5.2. В данном примере есть две основных цепочки.</p>
+<p>Графовое представление эквивалентно набору цепочек, т. е. оно так же решает проблему отображения системных вызовов на правила модели политики безопасности, однако оно заметно компактней и наглядней, а также проще в реализации. Формальным критерием консистентности данного представления для отдельного системного вызова является выполнимость требования, состоящего в том, что из текущего состояния ОС, параметров системного вызова, а также условий из всех предыдущих точек ветвления следует дизъюнкция условий каждой точки ветвления.</p>
+</section>
+<section id="пример-формализации-функциональной-спецификации" class="level2">
+<h2 class="anchored" data-anchor-id="пример-формализации-функциональной-спецификации">5.2. Пример формализации функциональной спецификации</h2>
+<p>МРОСЛ ДП-модель представлена на формализованном языке Event-B с использованием техники пошагового уточнения для отображения ее иерархической структуры. Мы будем использовать разновидность данной техники под названием расширенное уточнение и для формализации функциональной спецификации, что значительно упростит доказательство ее непротиворечивости и полноты. В расширенном уточнении благодаря представлению событий уточненной спецификации (формальной функциональной спецификации) в виде графовой модели можно провести соответствие между событиями уточняемой спецификации (Event-B спецификации МРОСЛ ДП-модели) и некоторыми узлами графов событий уточненной спецификации (ФСП). Рассмотрим данный метод на примере.</p>
+<p>В соответствии с предлагаемым методом узлы графов системных вызовов, которые соответствуют правилам МРОСЛ ДП-модели (узел создания файла в open является правилом перехода системы из состояния в состояние create_object МРОСЛ ДП-модели), будут представлены в ФСП как уточнения описывающих эти правила Event-B событий. Оставшиеся вспомогательные узлы (такие как разбор параметров pathname и flags системного вызова open) будут представлены как вспомогательные события, изменяющие исключительно дополненное состояние ФСП, которое затем будет связано инвариантами с состоянием Event-B спецификации МРОСЛ ДП-модели. Используя средства языка Event-B, данные события затем будут объединены в виде цепочек, где цепочка является одним из возможных путей в представляющем системный вызов графе.</p>
+<p>Покажем как это будет выглядеть на примере рассмотренного ранее частного случая обращения к системному вызову open, при котором файл с именем pathname не существует, параметр flags содержит флаги O_WRONLY и O_CREAT и у процесса, от имени которого вызывается open, есть все необходимые права доступа. Этому случаю в ФСП на Event-B будет соответствовать цепочка из восьми событий: <span class="math inline">open\_start \rightarrow open\_check\_p \rightarrow open\_write\_p \rightarrow open\_create \rightarrow open\_grant \rightarrow open\_check \rightarrow open\_write \rightarrow open\_finish</span> , где:</p>
+<ul>
+<li>в событии open_start находятся предусловия, описывающие разбор параметров системного вызова open и принимается решение, какое событие должно произойти следующим. В рассматриваемом частном случае открываемый файл не существует, так что следующим событием будет open_check_p.&nbsp;Если бы файл существовал, то следующим событием был бы open_check и в целом цепочка событий была бы другой;</li>
+<li>в событии <em>open_check_p</em> осуществляется проверка наличия требуемых прав доступа — в данном примере у вызывающего open процесса все нужные права доступа имеются;</li>
+<li>событие open_write является уточнением события access_write_entity Event-B спецификации МРОСЛ ДП-модели, которое описывает получение доступа на запись. В данном событии получается доступ на запись к каталогу, в котором будет создан файл;</li>
+<li>событие open_create является уточнением события create_object из Event-B спецификации МРОСЛ ДП-модели, которое описывает создание нового объекта (файла);</li>
+<li>событие <em>open_grant</em> является уточнением события <em>grant_rights</em> Event-B спецификации МРОСЛ ДП-модели, которое описывает получение прав доступа;</li>
+<li>в событии <em>open_check</em> осуществляется проверка наличия требуемых прав доступа и принимается решение, какое событие должно произойти следующим. В данном случае требуется получить доступ на запись к созданному файлу, следовательно, следующим событием будет <em>open_write</em>;</li>
+<li>событие open_write является уточнением события access_write_entity Event-B спецификации МРОСЛ ДП-модели, которое описывает получение доступа на запись;</li>
+<li>событие <em>open_finish</em> в своем постусловии возвращает запрашиваемый файловый дескриптор.</li>
+</ul>
+<p>Данная цепочка событий соответствует частному случаю системного вызова open. Для демонстрации метода на рис. 5.3 приводится граф, соответствующий еще нескольким частным случаям.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<svg width="672" height="480" viewbox="0.00 0.00 641.00 721.00" xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" style="; max-width: none; max-height: none">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 717)">
+<title>fig53</title>
+<!-- open_start -->
+<g id="node1" class="node">
+<title>open_start</title>
+<polygon fill="none" stroke="black" points="351.15,-713 276.85,-713 276.85,-677 351.15,-677 351.15,-713"></polygon>
+<text text-anchor="middle" x="314" y="-691.1" font-family="PT Sans" font-size="13.00">open_start</text>
+</g>
+<!-- open_check_p -->
+<g id="node2" class="node">
+<title>open_check_p</title>
+<polygon fill="none" stroke="black" points="315.58,-641 220.42,-641 220.42,-605 315.58,-605 315.58,-641"></polygon>
+<text text-anchor="middle" x="268" y="-619.1" font-family="PT Sans" font-size="13.00">open_check_p</text>
+</g>
+<!-- open_start&#45;&gt;open_check_p -->
+<g id="edge1" class="edge">
+<title>open_start-&gt;open_check_p</title>
+<path fill="none" stroke="black" d="M302.63,-676.7C296.95,-668.05 289.98,-657.45 283.79,-648.03"></path>
+<polygon fill="black" stroke="black" points="285.97,-646.25 279.24,-641.1 281.29,-649.33 285.97,-646.25"></polygon>
+</g>
+<!-- open_check -->
+<g id="node3" class="node">
+<title>open_check</title>
+<polygon fill="none" stroke="black" points="401.08,-292.4 318.92,-292.4 318.92,-256.4 401.08,-256.4 401.08,-292.4"></polygon>
+<text text-anchor="middle" x="360" y="-270.5" font-family="PT Sans" font-size="13.00">open_check</text>
+</g>
+<!-- open_start&#45;&gt;open_check -->
+<g id="edge2" class="edge">
+<title>open_start-&gt;open_check</title>
+<path fill="none" stroke="black" d="M322.87,-676.72C336.24,-649.03 360,-592.66 360,-541.9 360,-541.9 360,-541.9 360,-447.7 360,-395.53 360,-334.47 360,-300.85"></path>
+<polygon fill="black" stroke="black" points="362.8,-300.52 360,-292.52 357.2,-300.52 362.8,-300.52"></polygon>
+</g>
+<!-- open_finish -->
+<g id="node4" class="node">
+<title>open_finish</title>
+<polygon fill="none" stroke="black" points="614.88,-36 533.12,-36 533.12,0 614.88,0 614.88,-36"></polygon>
+<text text-anchor="middle" x="574" y="-14.1" font-family="PT Sans" font-size="13.00">open_finish</text>
+</g>
+<!-- open_start&#45;&gt;open_finish -->
+<g id="edge3" class="edge">
+<title>open_start-&gt;open_finish</title>
+<path fill="none" stroke="black" d="M351.22,-693.06C435.37,-688.77 633,-665.53 633,-541.9 633,-541.9 633,-541.9 633,-191.3 633,-136.27 605.73,-76.42 588.27,-43.75"></path>
+<polygon fill="black" stroke="black" points="590.57,-42.11 584.28,-36.43 585.65,-44.79 590.57,-42.11"></polygon>
+</g>
+<!-- open_error -->
+<g id="node5" class="node">
+<title>open_error</title>
+<polygon fill="none" stroke="black" points="255.53,-36 178.47,-36 178.47,0 255.53,0 255.53,-36"></polygon>
+<text text-anchor="middle" x="217" y="-14.1" font-family="PT Sans" font-size="13.00">open_error</text>
+</g>
+<!-- open_start&#45;&gt;open_error -->
+<g id="edge13" class="edge dg-fail">
+<title>open_start-&gt;open_error</title>
+<path fill="none" stroke="black" d="M276.75,-692.81C193.57,-687.98 0,-663.65 0,-541.9 0,-541.9 0,-541.9 0,-191.3 0,-130.05 21.96,-111.23 69,-72 97.96,-47.85 138.76,-34.33 170.2,-27"></path>
+<polygon fill="black" stroke="black" points="171.18,-29.65 178.38,-25.18 169.97,-24.18 171.18,-29.65"></polygon>
+</g>
+<!-- open_check_p&#45;&gt;open_error -->
+<g id="edge14" class="edge dg-fail">
+<title>open_check_p-&gt;open_error</title>
+<path fill="none" stroke="black" d="M268.03,-604.76C268,-559.43 267.12,-433.14 259,-328.4 250.12,-213.9 244.77,-185.46 227,-72 225.57,-62.89 223.76,-52.94 222.08,-44.15"></path>
+<polygon fill="black" stroke="black" points="224.79,-43.45 220.51,-36.14 219.3,-44.53 224.79,-43.45"></polygon>
+</g>
+<!-- open_write_p -->
+<g id="node6" class="node">
+<title>open_write_p</title>
+<polygon fill="none" stroke="black" points="104.74,-513.3 104.74,-568.5 227.26,-568.5 227.26,-513.3 104.74,-513.3"></polygon>
+<text text-anchor="middle" x="166" y="-550.8" font-family="PT Sans" font-size="13.00">open_write_p</text>
+<polyline fill="none" stroke="black" points="104.74,-540.9 227.26,-540.9 "></polyline>
+<text text-anchor="middle" x="166" y="-523.2" font-family="PT Sans" font-size="13.00">access_write_entity</text>
+</g>
+<!-- open_check_p&#45;&gt;open_write_p -->
+<g id="edge4" class="edge">
+<title>open_check_p-&gt;open_write_p</title>
+<path fill="none" stroke="black" d="M246.12,-604.82C234.55,-595.73 219.97,-584.28 206.43,-573.65"></path>
+<polygon fill="black" stroke="black" points="207.91,-571.25 199.89,-568.51 204.45,-575.66 207.91,-571.25"></polygon>
+</g>
+<!-- open_check&#45;&gt;open_error -->
+<g id="edge18" class="edge dg-fail">
+<title>open_check-&gt;open_error</title>
+<path fill="none" stroke="black" d="M354.38,-256.22C342.11,-220.13 310.59,-134.61 268,-72 260.76,-61.36 251.32,-50.89 242.54,-42.1"></path>
+<polygon fill="black" stroke="black" points="244.27,-39.88 236.59,-36.3 240.36,-43.89 244.27,-39.88"></polygon>
+</g>
+<!-- open_read -->
+<g id="node9" class="node">
+<title>open_read</title>
+<polygon fill="none" stroke="black" points="444.91,-164.7 444.91,-219.9 563.09,-219.9 563.09,-164.7 444.91,-164.7"></polygon>
+<text text-anchor="middle" x="504" y="-202.2" font-family="PT Sans" font-size="13.00">open_read</text>
+<polyline fill="none" stroke="black" points="444.91,-192.3 563.09,-192.3 "></polyline>
+<text text-anchor="middle" x="504" y="-174.6" font-family="PT Sans" font-size="13.00">access_read_entity</text>
+</g>
+<!-- open_check&#45;&gt;open_read -->
+<g id="edge8" class="edge">
+<title>open_check-&gt;open_read</title>
+<path fill="none" stroke="black" d="M390.89,-256.22C407.82,-246.8 429.31,-234.85 449,-223.9"></path>
+<polygon fill="black" stroke="black" points="450.53,-226.25 456.16,-219.91 447.81,-221.35 450.53,-226.25"></polygon>
+</g>
+<!-- open_write -->
+<g id="node10" class="node">
+<title>open_write</title>
+<polygon fill="none" stroke="black" points="348.74,-72.5 348.74,-127.7 471.26,-127.7 471.26,-72.5 348.74,-72.5"></polygon>
+<text text-anchor="middle" x="410" y="-110" font-family="PT Sans" font-size="13.00">open_write</text>
+<polyline fill="none" stroke="black" points="348.74,-100.1 471.26,-100.1 "></polyline>
+<text text-anchor="middle" x="410" y="-82.4" font-family="PT Sans" font-size="13.00">access_write_entity</text>
+</g>
+<!-- open_check&#45;&gt;open_write -->
+<g id="edge9" class="edge">
+<title>open_check-&gt;open_write</title>
+<path fill="none" stroke="black" d="M364.98,-256.25C373.08,-228.31 389.3,-172.45 399.89,-135.93"></path>
+<polygon fill="black" stroke="black" points="402.65,-136.46 402.19,-128 397.27,-134.9 402.65,-136.46"></polygon>
+</g>
+<!-- open_write_p&#45;&gt;open_error -->
+<g id="edge15" class="edge dg-fail">
+<title>open_write_p-&gt;open_error</title>
+<path fill="none" stroke="black" d="M137.89,-513.11C106.18,-479.87 59,-419.91 59,-357.5 59,-357.5 59,-357.5 59,-191.3 59,-130.27 84.15,-115.46 127,-72 139.58,-59.24 155.86,-48.43 171.11,-39.97"></path>
+<polygon fill="black" stroke="black" points="172.77,-42.26 178.49,-36.01 170.12,-37.33 172.77,-42.26"></polygon>
+</g>
+<!-- open_create -->
+<g id="node7" class="node">
+<title>open_create</title>
+<polygon fill="none" stroke="black" points="121.36,-421.1 121.36,-476.3 210.64,-476.3 210.64,-421.1 121.36,-421.1"></polygon>
+<text text-anchor="middle" x="166" y="-458.6" font-family="PT Sans" font-size="13.00">open_create</text>
+<polyline fill="none" stroke="black" points="121.36,-448.7 210.64,-448.7 "></polyline>
+<text text-anchor="middle" x="166" y="-431" font-family="PT Sans" font-size="13.00">create_object</text>
+</g>
+<!-- open_write_p&#45;&gt;open_create -->
+<g id="edge5" class="edge">
+<title>open_write_p-&gt;open_create</title>
+<path fill="none" stroke="black" d="M166,-512.84C166,-503.93 166,-493.89 166,-484.49"></path>
+<polygon fill="black" stroke="black" points="168.8,-484.43 166,-476.43 163.2,-484.43 168.8,-484.43"></polygon>
+</g>
+<!-- open_create&#45;&gt;open_error -->
+<g id="edge16" class="edge dg-fail">
+<title>open_create-&gt;open_error</title>
+<path fill="none" stroke="black" d="M153.64,-420.89C139.42,-387.54 118,-328.5 118,-275.4 118,-275.4 118,-275.4 118,-191.3 118,-131.14 163.93,-73 193.22,-42.03"></path>
+<polygon fill="black" stroke="black" points="195.3,-43.91 198.84,-36.21 191.27,-40.02 195.3,-43.91"></polygon>
+</g>
+<!-- open_grant -->
+<g id="node8" class="node">
+<title>open_grant</title>
+<polygon fill="none" stroke="black" points="161.59,-328.9 161.59,-384.1 244.41,-384.1 244.41,-328.9 161.59,-328.9"></polygon>
+<text text-anchor="middle" x="203" y="-366.4" font-family="PT Sans" font-size="13.00">open_grant</text>
+<polyline fill="none" stroke="black" points="161.59,-356.5 244.41,-356.5 "></polyline>
+<text text-anchor="middle" x="203" y="-338.8" font-family="PT Sans" font-size="13.00">grant_rights</text>
+</g>
+<!-- open_create&#45;&gt;open_grant -->
+<g id="edge6" class="edge">
+<title>open_create-&gt;open_grant</title>
+<path fill="none" stroke="black" d="M177.1,-420.64C180.83,-411.55 185.04,-401.29 188.96,-391.72"></path>
+<polygon fill="black" stroke="black" points="191.59,-392.7 192.03,-384.23 186.41,-390.57 191.59,-392.7"></polygon>
+</g>
+<!-- open_grant&#45;&gt;open_check -->
+<g id="edge7" class="edge">
+<title>open_grant-&gt;open_check</title>
+<path fill="none" stroke="black" d="M244.66,-334.24C267.78,-322.45 296.41,-307.85 319.36,-296.14"></path>
+<polygon fill="black" stroke="black" points="320.74,-298.57 326.59,-292.44 318.2,-293.58 320.74,-298.57"></polygon>
+</g>
+<!-- open_grant&#45;&gt;open_error -->
+<g id="edge17" class="edge dg-fail">
+<title>open_grant-&gt;open_error</title>
+<path fill="none" stroke="black" d="M204.11,-328.81C206.75,-265.42 213.36,-106.46 215.94,-44.39"></path>
+<polygon fill="black" stroke="black" points="218.75,-44.4 216.28,-36.29 213.15,-44.17 218.75,-44.4"></polygon>
+</g>
+<!-- open_read&#45;&gt;open_finish -->
+<g id="edge11" class="edge">
+<title>open_read-&gt;open_finish</title>
+<path fill="none" stroke="black" d="M519.24,-164.41C525.18,-153.38 531.8,-140.36 537,-128.2 549.06,-100.01 559.94,-66.45 566.73,-44.05"></path>
+<polygon fill="black" stroke="black" points="569.43,-44.8 569.04,-36.33 564.06,-43.19 569.43,-44.8"></polygon>
+</g>
+<!-- open_read&#45;&gt;open_error -->
+<g id="edge19" class="edge dg-fail">
+<title>open_read-&gt;open_error</title>
+<path fill="none" stroke="black" d="M508.01,-164.53C510.42,-137.53 509.38,-96.45 486,-72 456.05,-40.68 332.6,-27.1 263.82,-21.87"></path>
+<polygon fill="black" stroke="black" points="263.9,-19.07 255.71,-21.27 263.49,-24.65 263.9,-19.07"></polygon>
+</g>
+<!-- open_read&#45;&gt;open_write -->
+<g id="edge10" class="edge">
+<title>open_read-&gt;open_write</title>
+<path fill="none" stroke="black" d="M476.05,-164.48C466.01,-154.84 454.57,-143.87 444.06,-133.79"></path>
+<polygon fill="black" stroke="black" points="445.71,-131.49 438,-127.97 441.84,-135.53 445.71,-131.49"></polygon>
+</g>
+<!-- open_write&#45;&gt;open_finish -->
+<g id="edge12" class="edge">
+<title>open_write-&gt;open_finish</title>
+<path fill="none" stroke="black" d="M464.61,-72.43C486.52,-61.73 511.37,-49.59 531.85,-39.59"></path>
+<polygon fill="black" stroke="black" points="533.22,-42.03 539.18,-36.01 530.76,-37 533.22,-42.03"></polygon>
+</g>
+<!-- open_write&#45;&gt;open_error -->
+<g id="edge20" class="edge dg-fail">
+<title>open_write-&gt;open_error</title>
+<path fill="none" stroke="black" d="M348.67,-73.65C321.06,-62.19 289,-48.88 263.43,-38.27"></path>
+<polygon fill="black" stroke="black" points="264.18,-35.55 255.72,-35.07 262.03,-40.72 264.18,-35.55"></polygon>
+</g>
+</g>
+</svg>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Рис. 5.3. Граф Event-B событий нескольких частных случаев системного вызова open</p>
+<p>События ФСП, представляющие граф системного вызова open, изображены прямоугольниками; если событие вспомогательное, то в прямоугольнике показано только его имя, если же событие соответствует событию Event-B спецификации МРОСЛ ДП-модели, то в его прямоугольнике снизу показано имя уточняемого события.</p>
+<p>Если формализовать все оставшиеся частные случаи, то полученный граф будет являться формальной спецификацией поведения системного вызова open. При этом благодаря использованию уточнения данная спецификация будет корректна по построению и полностью соответствовать правилам МРОСЛ ДП-модели, что в свою очередь будет означать, что при любом сочетании параметров и состояния системы выполнение системного вызова open сохранит все установленные в МРОСЛ ДП-модели требования и свойства. После этого останется только доказать выполнимость инвариантов, которые связывают дополненное состояние и состояние МРОСЛ ДП-модели. В результате формализации подобным образом всех системных вызовов будет получена формальная функциональная спецификация с доказанными свойствами непротиворечивости и полноты.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<!-- Normalize Graphviz (dot) figures so the book's diagram CSS can size them.
+     Quarto stamps dot <svg> with a fixed width/height (default 7x5in) and an inline
+     style="max-width:none", which forces the wrong aspect ratio (vertical whitespace)
+     and defeats the responsive max-width in theme.scss. Removing the forced width/height
+     lets the intrinsic viewBox drive the aspect; clearing the inline max-* lets the
+     stylesheet cap the width. Mermaid manages its own sizing, so we touch dot only. -->
+<script>
+(function () {
+  function fit() {
+    document.querySelectorAll('main.content div.cell svg').forEach(function (svg) {
+      if (!svg.querySelector(':scope > g.graph')) return;   // graphviz output only
+      svg.removeAttribute('width');
+      svg.removeAttribute('height');
+      svg.style.maxWidth = '';
+      svg.style.maxHeight = '';
+    });
+  }
+  if (document.readyState !== 'loading') fit();
+  else document.addEventListener('DOMContentLoaded', fit);
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Скопировано");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Скопировано");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/eventb-rossi\.github\.io\/security_monograph\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chapters/04-event-b.html" class="pagination-link" aria-label="Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Глава 4. Event-B спецификация базового уровня МРОСЛ ДП-модели</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chapters/06-deductive-verification.html" class="pagination-link" aria-label="Глава 6. Дедуктивная верификация модуля безопасности ядра ОС Linux">
+        <span class="nav-page-text"><span class="chapter-title">Глава 6. Дедуктивная верификация модуля безопасности ядра ОС Linux</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
