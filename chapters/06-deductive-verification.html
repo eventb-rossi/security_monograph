@@ -81,9 +81,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-375f9023c1da6849cf4f3d7f8accab6b.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-ca1fdf2217a789155a14a984c486a011.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-6578a89ce411cc7cea6b839840eaf0e7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-ed1fd0ee0f3adaff5c7428ac643e46f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-9a2e7d1445780d7bd2217ec9235f2869.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-ed1fd0ee0f3adaff5c7428ac643e46f0.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -513,7 +513,77 @@ window.Quarto = {
 <p>Подсистема LSM — это интерфейс, на основе которого могут быть реализованы разнообразные модули безопасности. В дистрибутиве ОС Linux может присутствовать несколько модулей LSM, и при конфигурировании системы администратор выбирает, какой (или какие) из модулей следует использовать. Так, в базовой версии ядра v4.14 представлены системы мандатного контроля доступа SELinux, Smack, Tomoyo, AppArmor.</p>
 <p>Интерфейс LSM разрабатывался так, чтобы предоставлять все необходимое для реализации на его основе мандатной системы управления доступом <a href="../chapters/bibliography.html#ref-56">[56]</a>. Следует понимать, что механизм LSM — это прежде всего инструмент для дополнительного ограничения доступа, для реализации дополнительных проверок поверх основных (дискреционного управления доступом — DAC). LSM не может быть использован для того, чтобы заменять собой стандартные проверки прав доступа ядра Linux. LSM не предназначен для реализации каких-либо действий кроме проверок, например, затирания файлов на жестком диске при их удалении (secure_delete). Это является его архитектурными ограничениями. Начиная с версии ядра v4.2, вводится поддержка стековой модели работы модулей безопасности <a href="../chapters/bibliography.html#ref-57">[57]</a>, что подразумевает под собой контроль доступа не одним, а несколькими модулями LSM.</p>
 <p>Интерфейс LSM состоит из набора указателей на функции. Модуль безопасности должен реализовывать в себе соответствующие функции, зарегистрировать их в ядре при инициализации своей работы. Далее ядро вызывает функции интерфейса в тех участках своего кода, где требуется проверка прав доступа (например, при обработке системного вызова) или происходит выделение соответствующего ресурса (рис. 6.1). Правильность расстановки точек вызова функций интерфейса LSM в ядре анализировалась в <a href="../chapters/bibliography.html#ref-58">[58–61]</a>.</p>
-<p><img src="../images/fig6.1.svg" class="img-fluid"></p>
+<svg xmlns="http://www.w3.org/2000/svg" class="rossi-fig" width="660" height="388" viewbox="0 0 660 388" role="img" aria-label="Схема работы ядра ОС Linux с модулем LSM: субъект (процесс) инициирует системный вызов, который последовательно проходит проверку параметров, проверки доступа DAC и вызов интерфейса LSM; вызов интерфейса возвращает результат объекту (файлу), обменивается с модулем безопасности через реализацию интерфейса и обращается к структурам данных через механизм арбитража LSM; всё, кроме субъекта и объекта, выполняется внутри ядра Linux">
+  <!-- Theming lives in page CSS (svg.rossi-fig in theme.scss + per-mode --dg-* tokens); tracks the light/dark toggle. -->
+  <defs>
+    <marker id="ah61" markerwidth="9" markerheight="7" refx="8" refy="3.2" orient="auto-start-reverse" markerunits="userSpaceOnUse">
+      <path class="ink-fill" d="M0,0 L9,3.2 L0,6.4 Z"></path>
+    </marker>
+  </defs>
+
+  <!-- ===== dashed kernel boundary («Ядро Linux») — encloses the stack + the security module ===== -->
+  <rect class="hairline" fill="none" x="196" y="12" width="404" height="350" rx="3" stroke-width="1.3" stroke-dasharray="6 4"></rect>
+  <text x="588" y="32" font-size="14" font-weight="700" text-anchor="end">Ядро Linux</text>
+
+  <!-- ===== central action chain (uniform width) ===== -->
+  <g class="fill-node ink" stroke-width="1.4">
+    <rect x="215" y="24" width="170" height="32" rx="2"></rect>
+    <rect x="215" y="88" width="170" height="32" rx="2"></rect>
+    <rect x="215" y="150" width="170" height="46" rx="2"></rect>
+    <rect x="215" y="232" width="170" height="46" rx="2"></rect>
+    <rect x="215" y="318" width="170" height="32" rx="2"></rect>
+  </g>
+  <g font-size="14" text-anchor="middle">
+    <text x="300" y="45">Системный вызов</text>
+    <text x="300" y="109">Проверка параметров</text>
+    <text x="300" y="169">Проверки доступа</text>
+    <text x="300" y="187">(DAC)</text>
+    <text x="300" y="251">Вызов</text>
+    <text x="300" y="269">LSM интерфейса</text>
+    <text x="300" y="339">Структуры данных</text>
+  </g>
+
+  <!-- ===== external actors (outside the kernel, on the left) ===== -->
+  <g class="fill-node ink" stroke-width="1.4">
+    <rect x="40" y="20" width="130" height="40" rx="2"></rect>
+    <rect x="40" y="235" width="130" height="40" rx="2"></rect>
+  </g>
+  <g font-size="14" text-anchor="middle">
+    <text x="105" y="36">Субъект</text>
+    <text x="105" y="54">(процесс)</text>
+    <text x="105" y="251">Объект</text>
+    <text x="105" y="269">(файл)</text>
+  </g>
+
+  <!-- ===== security module (the one rust accent — semantic focus) ===== -->
+  <rect class="fill-node accent" x="435" y="232" width="150" height="46" rx="2" stroke-width="1.6"></rect>
+  <g font-size="14" text-anchor="middle">
+    <text x="510" y="251">Модуль</text>
+    <text x="510" y="269">безопасности</text>
+  </g>
+
+  <!-- ===== edges ===== -->
+  <g class="ink" fill="none" stroke-width="1.4" marker-end="url(#ah61)">
+    <path d="M170,40  L212,40"></path>    <!-- субъект -> системный вызов -->
+    <path d="M300,56  L300,85"></path>    <!-- 1 -> 2 -->
+    <path d="M300,120 L300,147"></path>   <!-- 2 -> 3 -->
+    <path d="M300,196 L300,229"></path>   <!-- 3 -> 4 -->
+    <path d="M215,255 L173,255"></path>   <!-- вызов LSM -> объект (влево) -->
+  </g>
+  <!-- double-headed: реализация интерфейса & LSM-арбитраж -->
+  <g class="ink" fill="none" stroke-width="1.4" marker-start="url(#ah61)" marker-end="url(#ah61)">
+    <path d="M385,255 L432,255"></path>   <!-- вызов LSM <-> модуль безопасности -->
+    <path d="M300,278 L300,315"></path>   <!-- вызов LSM <-> структуры данных -->
+  </g>
+
+  <!-- ===== arrow labels ===== -->
+  <g font-size="13" text-anchor="middle">
+    <text x="409" y="210">Реализация</text>
+    <text x="409" y="226">интерфейса</text>
+    <text x="348" y="293">LSM</text>
+    <text x="348" y="309">арбитраж</text>
+  </g>
+</svg>
 <p>Рис. 6.1. Схема работы ядра ОС Linux с модулем LSM</p>
 <p>Функции интерфейса делятся на два типа — оповещательные и контрольные. Первые нужны для того, чтобы модуль безопасности ядра знал, что ядро выделило какой-то ресурс, и мог, например, добавить в его поля собственную информацию о метках безопасности (атрибутах). Вторые — проверяют возможность доступа и возвращают код результата, например EACCES, EPERM (в случае, если доступ запрещен). Ядро анализирует результат обработки каждого из контрольных вызовов и продолжает обработку системного вызова или прекращает ее.</p>
 <p>Интерфейс LSM избыточен в том смысле, что контрольные и оповещательные вызовы дублируются на разных уровнях абстракции. Например, права доступа к файлам можно проверять как права доступа к определенном объекту (inode, dentry) или как права доступа по определенному пути. Разные модули безопасности реализуют эти проверки по-своему (например, SELinux использует проверки inode, AppArmor — проверки по пути).</p>
@@ -522,7 +592,78 @@ window.Quarto = {
 <p>Сам модуль безопасности может вызывать код подсистем ядра (рис. 6.2), запрашивая какие-то данные через функции (и в процессе работы этих функций управление опять может вернуться в модуль LSM, пройдя таким образом цикл по графу вызовов функций), вызывать какие-то библиотечные функции.</p>
 <p>То есть модуль безопасности, реализующий интерфейс LSM, как вызывается ядром Linux, так и сам активно вызывает функции ядра. Однозначным образом предсказать статическими методами, каким будет граф потока управления при обработке, например, системного вызова, не всегда возможно. В отдельных случаях подобные «запутанные» потоки управления могут приводить к взаимным блокировкам <a href="../chapters/bibliography.html#ref-62">[62]</a>.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>При обработке одного системного вызова может вызываться несколько функций интерфейса LSM. Рассмотрим пример, где происходит системный вызов <em>open</em> для открытия файла testfile на чтение. Файл testfile расположен в том же каталоге, что и программа, его открывающая. Можно увидеть (табл. 6.1), что во время обработки данного системного вызова интерфейс LSM вызывается 6 раз (3 оповещательных и 3 контрольных вызова).</p>
-<p><img src="../images/fig6.2.svg" class="img-fluid"></p>
+<svg xmlns="http://www.w3.org/2000/svg" class="rossi-fig" width="720" height="440" viewbox="0 0 720 440" role="img" aria-label="Взаимодействие модуля безопасности с компонентами ядра ОС Linux: подсистемы ядра — виртуальная файловая система (VFS), сетевой стек, управление процессами (PM) и управление памятью (MM), доступные через интерфейс системных вызовов, — вызывают модуль безопасности, который, в свою очередь, вызывает их обратно, а также обращается к библиотечным функциям (строковым, управления памятью и битовых операций); всё выполняется внутри ядра">
+  <!-- Theming lives in page CSS (svg.rossi-fig in theme.scss + per-mode --dg-* tokens); tracks the light/dark toggle. -->
+  <defs>
+    <marker id="ah62" markerwidth="9" markerheight="7" refx="8" refy="3.2" orient="auto-start-reverse" markerunits="userSpaceOnUse">
+      <path class="ink-fill" d="M0,0 L9,3.2 L0,6.4 Z"></path>
+    </marker>
+  </defs>
+
+  <!-- ===== dashed kernel boundary («Ядро»); label sits in the top margin band ===== -->
+  <rect class="hairline" fill="none" x="8" y="8" width="704" height="424" rx="3" stroke-width="1.3" stroke-dasharray="6 4"></rect>
+  <text x="694" y="28" font-size="14" font-weight="700" text-anchor="end">Ядро</text>
+
+  <!-- ===== system-call interface (top band) ===== -->
+  <rect class="fill-node ink" x="40" y="40" width="640" height="32" rx="2" stroke-width="1.4"></rect>
+  <text x="360" y="61" font-size="14" text-anchor="middle">Интерфейс системных вызовов</text>
+
+  <!-- ===== kernel subsystems (row of four) ===== -->
+  <g class="fill-node ink" stroke-width="1.4">
+    <rect x="40" y="88" width="148" height="72" rx="2"></rect>
+    <rect x="204" y="88" width="148" height="72" rx="2"></rect>
+    <rect x="368" y="88" width="148" height="72" rx="2"></rect>
+    <rect x="532" y="88" width="148" height="72" rx="2"></rect>
+  </g>
+  <g font-size="13" text-anchor="middle">
+    <text x="114" y="114">Виртуальная</text>
+    <text x="114" y="130">файловая система</text>
+    <text x="114" y="146">(VFS)</text>
+    <text x="278" y="122">Сетевой</text>
+    <text x="278" y="138">стек</text>
+    <text x="442" y="114">Управление</text>
+    <text x="442" y="130">процессами</text>
+    <text x="442" y="146">(PM)</text>
+    <text x="606" y="114">Управление</text>
+    <text x="606" y="130">памятью</text>
+    <text x="606" y="146">(MM)</text>
+  </g>
+
+  <!-- ===== security module (the one rust accent — semantic focus) ===== -->
+  <rect class="fill-node accent" x="150" y="226" width="420" height="56" rx="2" stroke-width="1.6"></rect>
+  <g font-size="14" text-anchor="middle">
+    <text x="360" y="250">Модуль</text>
+    <text x="360" y="268">безопасности</text>
+  </g>
+
+  <!-- ===== library functions (bottom band) ===== -->
+  <rect class="fill-node ink" x="40" y="318" width="640" height="32" rx="2" stroke-width="1.4"></rect>
+  <text x="360" y="339" font-size="14" text-anchor="middle">Библиотечные функции</text>
+  <g class="fill-node ink" stroke-width="1.4">
+    <rect x="40" y="364" width="200" height="48" rx="2"></rect>
+    <rect x="260" y="364" width="200" height="48" rx="2"></rect>
+    <rect x="480" y="364" width="200" height="48" rx="2"></rect>
+  </g>
+  <g font-size="13" text-anchor="middle">
+    <text x="140" y="384">Строковые</text>
+    <text x="140" y="400">функции</text>
+    <text x="360" y="384">Функции управления</text>
+    <text x="360" y="400">памятью</text>
+    <text x="580" y="384">Функции битовых</text>
+    <text x="580" y="400">операций</text>
+  </g>
+
+  <!-- ===== edges: subsystems call the module (down), module calls back (up) ===== -->
+  <g class="ink" fill="none" stroke-width="1.4" marker-end="url(#ah62)">
+    <path d="M125,160 L205,224"></path>   <!-- VFS -> module (diagonal) -->
+    <path d="M278,160 L278,224"></path>   <!-- Сетевой стек -> module -->
+    <path d="M442,160 L442,224"></path>   <!-- Управление процессами -> module -->
+    <path d="M595,160 L515,224"></path>   <!-- Управление памятью -> module (diagonal) -->
+    <path d="M172,224 L172,172"></path>   <!-- callback (left) -->
+    <path d="M548,224 L548,172"></path>   <!-- callback (right) -->
+    <path d="M360,282 L360,316"></path>   <!-- module -> библиотечные функции -->
+  </g>
+</svg>
 <p>Рис. 6.2. Взаимодействие модуля безопасности с компонентами ядра ОС Linux</p>
 <p>В ядре системный вызов open раскрывается в вызов функции do_open, из нее управление передается в do_filp_open и затем в path_openat. В последней сначала через серию вызовов контрольного интерфейса inode_permission с флагом MAY_EXEC осуществляется проверка прав доступа к родительскому каталогу файла (link_path_walk). После этого управление передается в vfs_open, do_dentry_open. В последней осуществляется вызов контрольного интерфейса file_open. Затем в зависимости от типа файла и файловой системы вызывается специальный обработчик операции. Для файлов ext4 — это ext4_file_open. В нем осуществляются специфичные для формата файловой системы действия. Для каталогов ext4 — это ext4_dir_open. В ext4_dir_open не производится никаких проверок, за исключением случаев, когда файловая система зашифрована.</p>
 <p>На данном примере можно увидеть, что при обработке системного вызова ядро Linux сначала выделяет пустой файловый дескриптор и дает модулю безопасности записать в него свои метаданные. Затем происходит проверка прав доступа к родительскому каталогу открываемого файла (флаг MAY_EXEC для открытия каталога). После происходит аллокация структуры индексного дескриптора, о чем сообщается модулю безопасности. Далее происходит связывание структур индексного дескриптора со структурой dentry. Если бы данный файл к настоящему моменту использовался другими программами, то двух последних действий могло бы и не произойти. Затем происходит проверка доступа к индексному дескриптору файла testfile на чтение. То же действие повторяется на уровне файлового дескриптора.</p>
@@ -589,7 +730,42 @@ window.Quarto = {
 </tr>
 </tbody>
 </table>
-<p><img src="../images/fig6.3.svg" class="img-fluid"></p>
+<svg xmlns="http://www.w3.org/2000/svg" class="rossi-fig" width="480" height="400" viewbox="0 0 480 400" role="img" aria-label="Схема процесса верификации кода модуля LSM: разработка и верификация спецификации интерфейса LSM, затем рекурсивная верификация функций LSM с разработкой и верификацией спецификаций вызываемых функций">
+  <!-- Theming lives in page CSS (svg.rossi-fig in theme.scss + per-mode --dg-* tokens); tracks the light/dark toggle. -->
+  <defs>
+    <marker id="ah-ink" markerwidth="9" markerheight="7" refx="8" refy="3.2" orient="auto" markerunits="userSpaceOnUse">
+      <path class="ink-fill" d="M0,0 L9,3.2 L0,6.4 Z"></path>
+    </marker>
+    <marker id="ah-acc" markerwidth="10" markerheight="8" refx="8" refy="3.6" orient="auto" markerunits="userSpaceOnUse">
+      <path class="accent-fill" d="M0,0 L10,3.6 L0,7.2 Z"></path>
+    </marker>
+  </defs>
+
+  <!-- 1. top box: verify the LSM interface specification -->
+  <rect class="fill-node ink" x="90" y="16" width="300" height="74" rx="2" stroke-width="1.4"></rect>
+  <g font-size="13" text-anchor="middle">
+    <text x="240" y="47">Разработка и верификация формальной</text>
+    <text x="240" y="68">спецификации интерфейса LSM</text>
+  </g>
+
+  <!-- 2. arrow down into the container -->
+  <path class="ink" fill="none" stroke-width="1.6" d="M240,90 L240,121" marker-end="url(#ah-ink)"></path>
+
+  <!-- 3. container: "Верификация функций LSM" (transparent, hairline border) -->
+  <rect class="hairline" fill="none" x="36" y="124" width="408" height="258" rx="3" stroke-width="1.3"></rect>
+  <text x="240" y="147" font-size="13" text-anchor="middle">Верификация функций LSM</text>
+
+  <!-- 4a. recursion ring (rust circular arrow, gap + arrowhead at top) around the inner box -->
+  <path class="accent" fill="none" stroke-width="2" d="M256,183 A140,86 0 1 1 224,183" marker-end="url(#ah-acc)"></path>
+
+  <!-- 4b. inner box: develop & verify specs of the called functions -->
+  <rect class="fill-node ink" x="142" y="216" width="196" height="104" rx="2" stroke-width="1.4"></rect>
+  <g font-size="13" text-anchor="middle">
+    <text x="240" y="250">Разработка и верификация</text>
+    <text x="240" y="270">спецификаций вызываемых</text>
+    <text x="240" y="290">из LSM функций</text>
+  </g>
+</svg>
 <p>Рис. 6.3. Схема процесса верификации кода модуля LSM</p>
 <p>На этом небольшом примере можно увидеть, что некоторые проверки выполняются на разных уровнях представления: индексные дескрипторы служат для описания метаданных файла (есть взаимно-однозначное соответствие данных на диске и индексного дескриптора), структура file является дескриптором открытого файла у процесса и ссылается на индексный дескриптор. Также можно увидеть, что цепочка вызовов функций LSM сильно зависит от текущего состояния ядра и аргументов системного вызова. Например, если бы файл testfile был расположен в другом каталоге, то появились бы дополнительные контрольные вызовы <span class="math inline">inode\_permission</span> и могли бы появиться оповещательные вызовы <span class="math inline">inode\_alloc\_security</span> и <span class="math inline">d\_instantiate</span> .</p>
 <p>Исходя из описанной структуры модуля LSM и схемы его интеграции с ядром ОС Linux разработка спецификаций и верификация программного кода модуля LSM состоит из следующих работ (рис. 6.3):</p>
